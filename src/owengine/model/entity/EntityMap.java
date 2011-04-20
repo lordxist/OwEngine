@@ -29,7 +29,7 @@ public class EntityMap<T extends Entity> {
 		return Collections.unmodifiableCollection(entities);
 	}
 
-	public Collection<T> friendEntities() {
+	Collection<T> friendEntities() {
 		return entities;
 	}
 
