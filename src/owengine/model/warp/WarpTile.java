@@ -4,7 +4,7 @@ import java.awt.Point;
 
 import owengine.model.entity.Entity;
 
-public class WarpTile<T extends Entity<T>> {
+public class WarpTile<T extends Entity> {
 
 	private Point targetPos;
 	private WarpMap<T> targetMap;

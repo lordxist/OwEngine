@@ -9,19 +9,19 @@ import owengine.model.util.direction.MoveDir;
 import owengine.model.warp.WarpMap;
 import owengine.model.warp.WarpMapPosition;
 
-public abstract class MovablePosition<T extends Entity<T>> extends WarpMapPosition<T>
+public abstract class MovablePosition<T extends Entity> extends WarpMapPosition<T>
 	implements ActionUser {
 
 	protected MoveDir dir;
 	protected int moveSpeed;
 	protected MovementAction action = MovementAction.NULL;
 
-	public static <T extends Entity<T>> MovablePosition<T> createBasic(
+	public static <T extends Entity> MovablePosition<T> createBasic(
 			T entity, WarpMap<T> map, int x, int y, MoveDir dir, int moveSpeed) {
 		return new BasicMovablePosition<T>(entity, map, x, y, dir, moveSpeed);
 	}
 
-	public static <T extends Entity<T>> MovablePosition<T> createTurning(
+	public static <T extends Entity> MovablePosition<T> createTurning(
 			T entity, WarpMap<T> map, int x, int y, MoveDir dir, int moveSpeed) {
 		return new TurningMovablePosition<T>(entity, map, x, y, dir, moveSpeed);
 	}

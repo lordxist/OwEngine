@@ -8,7 +8,7 @@ import owengine.model.util.position.PositionedArrayList;
 import owengine.model.warp.WarpMap;
 import owengine.model.warp.WarpMapPosition;
 
-public class EventMap<T extends Entity<T>> extends WarpMap<T> {
+public class EventMap<T extends Entity> extends WarpMap<T> {
 
 	private static class EventTile extends BasicPositioned {
 

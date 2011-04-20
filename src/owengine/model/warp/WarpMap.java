@@ -6,7 +6,7 @@ import owengine.model.entity.Entity;
 import owengine.model.entity.EntityMap;
 import owengine.model.util.NullObjectHashMap;
 
-public class WarpMap<T extends Entity<T>> extends EntityMap<T> {
+public class WarpMap<T extends Entity> extends EntityMap<T> {
 
 	private WarpTile<T> nullWarpTile = new WarpTile<T>(null, null) {
 		@Override public void warp(WarpMapPosition<T> w) {}

@@ -7,7 +7,7 @@ import java.util.Collections;
 
 import owengine.model.util.position.PositionedArrayList;
 
-public class EntityMap<T extends Entity<T>> {
+public class EntityMap<T extends Entity> {
 
 	private PositionedArrayList<T> entities = new PositionedArrayList<T>();
 	private ArrayList<Point> blockedTiles = new ArrayList<Point>();
@@ -21,7 +21,7 @@ public class EntityMap<T extends Entity<T>> {
 	}
 
 	public void update(int delta) {
-		for (Entity<T> entity : new ArrayList<Entity<T>>(entities))
+		for (Entity entity : new ArrayList<Entity>(entities))
 			entity.update(delta);
 	}
 

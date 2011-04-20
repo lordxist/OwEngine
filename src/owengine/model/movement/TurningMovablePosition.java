@@ -4,7 +4,7 @@ import owengine.model.entity.Entity;
 import owengine.model.util.direction.MoveDir;
 import owengine.model.warp.WarpMap;
 
-class TurningMovablePosition<T extends Entity<T>> extends BasicMovablePosition<T> {
+class TurningMovablePosition<T extends Entity> extends BasicMovablePosition<T> {
 
 	private static final long serialVersionUID = 4079563121521830727L;
 

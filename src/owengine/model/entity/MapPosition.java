@@ -2,7 +2,7 @@ package owengine.model.entity;
 
 import java.awt.Point;
 
-public abstract class MapPosition<T extends Entity<T>> extends Point{
+public abstract class MapPosition<T extends Entity> extends Point{
 
 	private EntityMap<T> map;
 	protected T entity;

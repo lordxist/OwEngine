@@ -6,7 +6,7 @@ import owengine.model.entity.Entity;
 import owengine.model.entity.MapPosition;
 import owengine.model.util.direction.MoveDir;
 
-public abstract class WarpMapPosition<T extends Entity<T>> extends MapPosition<T>  {
+public abstract class WarpMapPosition<T extends Entity> extends MapPosition<T>  {
 
 	private static final long serialVersionUID = -7627958841257895940L;
 

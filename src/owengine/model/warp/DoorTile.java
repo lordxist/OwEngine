@@ -5,7 +5,7 @@ import java.awt.Point;
 import owengine.model.entity.Entity;
 import owengine.model.util.direction.MoveDir;
 
-public class DoorTile<T extends Entity<T>> extends WarpTile<T> {
+public class DoorTile<T extends Entity> extends WarpTile<T> {
 
 	private MoveDir dir;
 
