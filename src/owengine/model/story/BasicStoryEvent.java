@@ -6,6 +6,8 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.script.Compilable;
+import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -27,6 +29,14 @@ public /*abstract*/ class BasicStoryEvent {
 		ScriptEngineManager m = new ScriptEngineManager();
 		engine = m.getEngineByName("jruby");
 		engine.put("world", this);
+		try {
+			RandomAccessFile file = new RandomAccessFile("scripts/world.rb", "r");
+			byte[] script = new byte[(int) file.length()];
+			file.readFully(script);
+			engine.eval(new String(script));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private String script;
@@ -36,7 +46,8 @@ public /*abstract*/ class BasicStoryEvent {
 	protected boolean running;
 	protected boolean active;
 	private String scriptName;
-	private CmdList cmdList;
+	private HashMap<String, CompiledScript> cScripts =
+		new HashMap<String, CompiledScript>();
 
 	public void update(int delta) {
 		if (activeCmdQueue.isEmpty())
@@ -80,7 +91,7 @@ public /*abstract*/ class BasicStoryEvent {
 	public void run() {
 		if (!active) return;
 		cmdQueue.clear();
-		cmdList.init();
+		initCmdQueue();
 		activeCmdQueue = new ArrayList<Command>(cmdQueue);
 		if (!activeCmdQueue.isEmpty())
 			activeCmdQueue.get(0).init();
@@ -112,33 +123,16 @@ public /*abstract*/ class BasicStoryEvent {
 		protected abstract void init();
 	}
 
-	public static abstract class CmdList {
-		private BasicStoryEvent event;
-
-		public CmdList(BasicStoryEvent event) {
-			this.event = event;
-		}
-
-		public BasicStoryEvent getEvent() {
-			return event;
-		}
-
-		public abstract void init();
-	}
-
-	/* testing this... */
-	protected void initCmdQueue(ScriptEngine engine, String script) {
-		initCmdQueueAlternative(engine, script);
-	}
-
-	protected void initCmdQueueAlternative(final ScriptEngine engine, final String script) {
+	protected void initCmdQueue() {
 		try {
-			engine.eval(script);
+			CompiledScript cScript = cScripts.get(scriptName);
+			//if (cScript != null) {
+				cScript.eval();
+			//}
+			//else {
+			//	engine.eval(script);
+			//}
 		} catch (Exception exc) {exc.printStackTrace();}
-	}
-
-	public void setCmdList(CmdList list) {
-		cmdList = list;
 	}
 	
 	public void setScriptName(String name) {
@@ -148,7 +142,9 @@ public /*abstract*/ class BasicStoryEvent {
 			byte[] script = new byte[(int) file.length()];
 			file.readFully(script);
 			this.script = new String(script);
-			initCmdQueue(engine, this.script);
+			Compilable compilingEngine = (Compilable)engine;
+			CompiledScript cScript = compilingEngine.compile(this.script);
+			cScripts.put(name, cScript);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

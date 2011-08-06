@@ -14,15 +14,14 @@ end
 class Shortcut
   attr_reader :link
 
-  def initialize(link, world)
+  def initialize(link)
     @link = link
-    @world = world
   end
   
   def method_missing(sym, *args, &block)
-    cmd = ConcreteCommand.new(@world, @link)
+    cmd = ConcreteCommand.new($world, @link)
     cmd.set_call_objects(sym, args)
-    @world.add_cmd(cmd)
+    $world.add_cmd(cmd)
   end
 end
 
