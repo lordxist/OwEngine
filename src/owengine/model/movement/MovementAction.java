@@ -5,12 +5,6 @@ import owengine.model.util.action.ActionType;
 
 class MovementAction extends Action {
 
-	interface Movable {
-	
-		void finishMove();
-	
-	}
-
 	static final MovementAction NULL = new MovementAction(null, 0) {
 		@Override
 		public boolean isFinished() {
@@ -31,12 +25,12 @@ class MovementAction extends Action {
 		return new MovementAction(MovementActionType.turn, moveSpeed/2);
 	}
 
-	static MovementAction createMoveAction(int moveSpeed, Movable mov) {
+	static MovementAction createMoveAction(int moveSpeed, MovablePosition<?> mov) {
 		final class MoveAction extends MovementAction {
 			
-			private final Movable mov;
+			private final MovablePosition<?> mov;
 
-			private MoveAction(int moveSpeed, Movable mov) {
+			private MoveAction(int moveSpeed, MovablePosition<?> mov) {
 				super(MovementActionType.move, moveSpeed);
 				this.mov = mov;
 			}

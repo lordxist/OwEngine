@@ -4,8 +4,7 @@ import owengine.model.entity.Entity;
 import owengine.model.util.direction.MoveDir;
 import owengine.model.warp.WarpMap;
 
-class BasicMovablePosition<T extends Entity> extends MovablePosition<T>
-		implements MovementAction.Movable {
+class BasicMovablePosition<T extends Entity> extends MovablePosition<T> {
 
 	private static final long serialVersionUID = -4215041581933790391L;
 
@@ -24,7 +23,7 @@ class BasicMovablePosition<T extends Entity> extends MovablePosition<T>
 	}
 
 	@Override
-	public void finishMove() {
+	void finishMove() {
 		translate(dir.getX(), dir.getY());
 		warp();
 		

@@ -43,6 +43,8 @@ public abstract class MovablePosition<T extends Entity> extends WarpMapPosition<
 
 	abstract void forceActivateMovement(MoveDir dir);
 
+	abstract void finishMove();
+
 	public MoveDir getDir() {
 		return dir;
 	}
