@@ -5,10 +5,15 @@ public class Action {
 	private ActionType type;
 	private int delta, duration;
 	private boolean finished;
+	private boolean started;
 
 	public Action(ActionType type, int duration) {
 		this.type = type;
 		this.duration = duration;
+	}
+
+	public void start() {
+		started = true;
 	}
 
 	public void update(int delta) {
@@ -42,5 +47,9 @@ public class Action {
 	}
 
 	protected void finish() {}
+
+	public boolean isStarted() {
+		return started;
+	}
 
 }

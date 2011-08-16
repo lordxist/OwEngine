@@ -3,6 +3,7 @@ package owengine.model.story;
 import java.awt.Point;
 
 import owengine.model.entity.Entity;
+import owengine.model.movement.MovablePosition;
 import owengine.model.util.position.BasicPositioned;
 import owengine.model.util.position.PositionedArrayList;
 import owengine.model.warp.WarpMap;
@@ -12,7 +13,7 @@ public class EventMap<T extends Entity> extends WarpMap<T> {
 
 	private static class EventTile extends BasicPositioned {
 
-		private static final EventTile NULL = new EventTile(0, 0, null) {
+		private static final EventTile NULL = new EventTile(0, 0, null, null) {
 			@Override
 			void runEvent() {}
 		};
@@ -20,9 +21,12 @@ public class EventMap<T extends Entity> extends WarpMap<T> {
 		private Point pos;
 		private StoryEvent event;
 
-		private EventTile(int x, int y, StoryEvent event) {
+		private EventTile(int x, int y, StoryEvent event, EventActionQueue queue) {
 			this.pos = new Point(x, y);
 			this.event = event;
+			if (this.event != null) {
+				this.event.setQueue(queue);
+			}
 		}
 
 		@Override
@@ -42,10 +46,12 @@ public class EventMap<T extends Entity> extends WarpMap<T> {
 
 	private PositionedArrayList<EventTile> eventTiles =
 		new PositionedArrayList<EventTile>(EventTile.NULL);
-	private T player;
+	private MovablePosition<T> player;
+	private EventActionQueue queue;
 
-	public EventMap(T player) {
+	public EventMap(MovablePosition<T> player) {
 		this.player = player;
+		this.queue = new EventActionQueue();
 	}
 
 	public void update(int delta) {
@@ -55,7 +61,7 @@ public class EventMap<T extends Entity> extends WarpMap<T> {
 	}
 
 	public void addEventTile(int x, int y, StoryEvent event) {
-		eventTiles.add(new EventTile(x, y, event));
+		eventTiles.add(new EventTile(x, y, event, queue));
 	}
 
 	public void removeEventTile(EventTile e) {
@@ -65,7 +71,7 @@ public class EventMap<T extends Entity> extends WarpMap<T> {
 	@Override
 	public void warp(WarpMapPosition<T> w) {
 		super.warp(w);
-		if (w != player.getPos()) return;
+		if (w != player) return;
 		eventTiles.at(w.getPos()).runEvent();
 	}
 

@@ -3,6 +3,7 @@ package owengine.model.movement;
 import java.awt.Point;
 
 import owengine.model.entity.Entity;
+import owengine.model.story.EventAction;
 import owengine.model.util.action.Action;
 import owengine.model.util.action.ActionUser;
 import owengine.model.util.direction.MoveDir;
@@ -33,6 +34,7 @@ public abstract class MovablePosition<T extends Entity> extends WarpMapPosition<
 		this.moveSpeed = moveSpeed;
 	}
 
+	@EventAction
 	public void activateMovement(MoveDir dir) {
 		if (!action.isFinished()) return;
 		else {

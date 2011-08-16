@@ -8,4 +8,6 @@ public interface StoryEvent {
 
 	void run();
 
+	void setQueue(EventActionQueue queue);
+
 }
