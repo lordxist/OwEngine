@@ -13,7 +13,7 @@ public class EventMap<T extends Entity> extends WarpMap<T> {
 
 	private static class EventTile extends BasicPositioned {
 
-		private static final EventTile NULL = new EventTile(0, 0, null, null) {
+		private static final EventTile NULL = new EventTile(0, 0, null) {
 			@Override
 			void runEvent() {}
 		};
@@ -21,12 +21,9 @@ public class EventMap<T extends Entity> extends WarpMap<T> {
 		private Point pos;
 		private StoryEvent event;
 
-		private EventTile(int x, int y, StoryEvent event, EventActionQueue queue) {
+		private EventTile(int x, int y, StoryEvent event) {
 			this.pos = new Point(x, y);
 			this.event = event;
-			if (this.event != null) {
-				this.event.setQueue(queue);
-			}
 		}
 
 		@Override
@@ -34,12 +31,8 @@ public class EventMap<T extends Entity> extends WarpMap<T> {
 			return pos;
 		}
 
-		private StoryEvent getEvent() {
-			return event;
-		}
-
 		void runEvent() {
-			event.run();
+			new Thread(event).start();
 		}
 
 	}
@@ -47,21 +40,13 @@ public class EventMap<T extends Entity> extends WarpMap<T> {
 	private PositionedArrayList<EventTile> eventTiles =
 		new PositionedArrayList<EventTile>(EventTile.NULL);
 	private MovablePosition<T> player;
-	private EventActionQueue queue;
 
 	public EventMap(MovablePosition<T> player) {
 		this.player = player;
-		this.queue = new EventActionQueue();
-	}
-
-	public void update(int delta) {
-		super.update(delta);
-		for (EventTile e : eventTiles)
-			e.getEvent().update(delta);
 	}
 
 	public void addEventTile(int x, int y, StoryEvent event) {
-		eventTiles.add(new EventTile(x, y, event, queue));
+		eventTiles.add(new EventTile(x, y, event));
 	}
 
 	public void removeEventTile(EventTile e) {
