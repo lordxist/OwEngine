@@ -3,11 +3,9 @@ package owengine.controller;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import owengine.model.movement.MovablePosition;
+import owengine.model.movement.Movable;
 
-public interface ControlledMovable {
-
-	MovablePosition<?> getPos();
+public interface ControlledMovable extends Movable {
 
 	ArrayList<Point> getMoves();
 

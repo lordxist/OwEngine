@@ -2,48 +2,72 @@ package owengine.model.movement;
 
 import java.awt.Point;
 
-import owengine.model.entity.Entity;
+import owengine.model.map.ActionEntity;
+import owengine.model.map.Entity;
+import owengine.model.map.EntityMap;
+import owengine.model.map.MoveDir;
 import owengine.model.util.action.Action;
-import owengine.model.util.action.ActionUser;
-import owengine.model.util.direction.MoveDir;
-import owengine.model.warp.WarpMap;
-import owengine.model.warp.WarpMapPosition;
 
-public abstract class MovablePosition<T extends Entity> extends WarpMapPosition<T>
-	implements ActionUser {
+public class MovablePosition extends Point {
+
+	private static final long serialVersionUID = 1L;
 
 	protected MoveDir dir;
 	protected int moveSpeed;
-	protected MovementAction action = MovementAction.NULL;
+	private EntityMap map;
+	protected ActionEntity entity;
+	private boolean turning = true;
+	private boolean bumping = true;
 
-	public static <T extends Entity> MovablePosition<T> createBasic(
-			T entity, WarpMap<T> map, int x, int y, MoveDir dir, int moveSpeed) {
-		return new BasicMovablePosition<T>(entity, map, x, y, dir, moveSpeed);
-	}
-
-	public static <T extends Entity> MovablePosition<T> createTurning(
-			T entity, WarpMap<T> map, int x, int y, MoveDir dir, int moveSpeed) {
-		return new TurningMovablePosition<T>(entity, map, x, y, dir, moveSpeed);
-	}
-
-	MovablePosition(
-			T entity, WarpMap<T> map ,int x, int y, MoveDir dir, int moveSpeed) {
-		super(entity, map, x, y);
+	public MovablePosition(
+			ActionEntity entity, EntityMap map ,int x, int y, MoveDir dir, int moveSpeed) {
+		super(x, y);
+		this.entity = entity;
+		this.map = map;
 		this.dir = dir;
 		this.moveSpeed = moveSpeed;
 	}
 
 	public void activateMovement(MoveDir dir) {
-		if (!action.isFinished()) return;
-		else {
-			//transfer(dir);
-			forceActivateMovement(dir);
+		if (this.dir == dir) {
+			moveForward();
+		} else if (turning) {
+			turn(dir);
+		} else {
+			this.dir = dir;
+			moveForward();
 		}
 	}
 
-	abstract void forceActivateMovement(MoveDir dir);
+	public void moveForward() {
+		if (!map.isPosBlocked(getPointNextTo())) {
+			entity.startAction(new Action(MovementActionType.move, moveSpeed) {
+				@Override
+				protected void start() {
+					getMap().prepareMove(entity, getPointNextTo());
+					getMap().moveOnMap(Entity.NULL, getPointNextTo());
+				}
+				
+				@Override
+				protected void finish() {
+					getMap().moveOnMap(entity, getPointNextTo());
+				}
+			});
+		} else if (bumping) {
+			entity.startAction(new Action(MovementActionType.bump, moveSpeed));
+		}
+	}
 
-	abstract void finishMove();
+	public void turn(final MoveDir dir) {
+		if (this.dir != dir) {
+			entity.startAction(new Action(MovementActionType.turn, moveSpeed/2) {
+				@Override
+				protected void finish() {
+					MovablePosition.this.dir = dir;
+				}
+			});
+		}
+	}
 
 	public MoveDir getDir() {
 		return dir;
@@ -51,10 +75,6 @@ public abstract class MovablePosition<T extends Entity> extends WarpMapPosition<
 
 	public void setDir(MoveDir dir) {
 		this.dir = dir;
-	}
-
-	public Action getAction() {
-		return action;
 	}
 
 	public int getMoveSpeed() {
@@ -65,18 +85,14 @@ public abstract class MovablePosition<T extends Entity> extends WarpMapPosition<
 		this.moveSpeed = moveSpeed;
 	}
 
-	public T getEntityNextTo() {
-		return getEntityAt(getPointNextTo());
+	public Entity getEntityNextTo() {
+		return map.getEntityAt(getPointNextTo());
 	}
 
-	public T getEntityNextTo(T nullObject) {
-		T nextTo = getEntityNextTo();
+	public Entity getEntityNextTo(Entity nullObject) {
+		Entity nextTo = getEntityNextTo();
 		if (nextTo == null) return nullObject;
 		else return nextTo;
-	}
-
-	protected boolean isNextToBlocked() {
-		return isPosBlocked(getPointNextTo());
 	}
 
 	private Point getPointNextTo() {
@@ -88,11 +104,43 @@ public abstract class MovablePosition<T extends Entity> extends WarpMapPosition<
 	}
 
 	public boolean isMoving() {
-		return !action.isFinished() && action.hasType(MovementActionType.move);
+		return entity.getActionType() == MovementActionType.move;
 	}
 
-	public void face(MovablePosition<T> caller) {
+	public void face(Directed caller) {
 		setDir(caller.getDir().getOpposite());
+	}
+
+	public Entity getEntity() {
+		return entity;
+	}
+
+	public void setMap(EntityMap map) {
+		this.map = map;
+	}
+
+	public EntityMap getMap() {
+		return map;
+	}
+
+	public void setPos(Point p) {
+		setLocation(p);
+	}
+
+	public boolean isTurning() {
+		return turning;
+	}
+
+	public void setTurning(boolean turning) {
+		this.turning = turning;
+	}
+
+	public boolean isBumping() {
+		return bumping;
+	}
+
+	public void setBumping(boolean bumping) {
+		this.bumping = bumping;
 	}
 
 }

@@ -12,9 +12,12 @@ public class Action {
 		this.duration = duration;
 	}
 
-	public void start() {
+	public void init() {
 		started = true;
+		start();
 	}
+
+	protected void start() {}
 
 	public void update(int delta) {
 		if (isFinished()) return;

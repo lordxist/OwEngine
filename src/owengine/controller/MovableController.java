@@ -2,7 +2,7 @@ package owengine.controller;
 
 import java.awt.Point;
 
-import owengine.model.util.direction.MoveDir;
+import owengine.model.map.MoveDir;
 
 public class MovableController {
 
@@ -17,11 +17,11 @@ public class MovableController {
 	public void update(int delta) {
 		this.delta += delta;
 		if (this.delta >= delay &&
-				mov.getPos().getAction().isFinished()) {
+				mov.isInactive()) {
 			if (mov.getPos().equals(mov.getMoves().get(step)))
 				step++;
 			step %= mov.getMoves().size();
-			mov.getPos().activateMovement(calcMoveDir());
+			mov.activateMovement(calcMoveDir());
 			this.delta = 0;
 		}
 	}
