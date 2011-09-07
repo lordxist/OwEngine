@@ -3,9 +3,10 @@ package owengine.model.action;
 public abstract class ActionUser {
 
 	protected Action action = NullAction.INSTANCE;
+	private boolean disabled;
 
 	public void startAction(Action action) {
-		if (isInactive()) {
+		if (isInactive() && !disabled) {
 			this.action = action;
 			this.action.init();
 		}
@@ -32,6 +33,14 @@ public abstract class ActionUser {
 
 	public boolean isInactive() {
 		return (action instanceof NullAction);
+	}
+
+	public void disable() {
+		disabled = true;
+	}
+
+	public void enable() {
+		disabled = false;
 	}
 
 }

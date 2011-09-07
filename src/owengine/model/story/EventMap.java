@@ -1,16 +1,16 @@
 package owengine.model.story;
 
 import java.awt.Point;
+import java.util.HashMap;
 
 import owengine.model.map.Entity;
 import owengine.model.map.EntityMap;
-import owengine.model.util.NullObjectHashMap;
 
 public class EventMap extends EntityMap {
 
-	private NullObjectHashMap<Point, StoryEvent> eventTiles =
-		new NullObjectHashMap<Point, StoryEvent>(StoryEvent.NULL);
+	private HashMap<Point, StoryEvent> eventTiles = new HashMap<Point, StoryEvent>();
 	private Entity player;
+	private boolean eventRunning;
 
 	public EventMap(Entity player) {
 		this.player = player;
@@ -27,7 +27,18 @@ public class EventMap extends EntityMap {
 	@Override
 	public void update(int delta) {
 		super.update(delta);
-		eventTiles.get(player.getPos()).start();
+		if (eventRunning) {
+			return;
+		}
+		StoryEvent event = eventTiles.get(player.getPos());
+		if (event != null) {
+			eventRunning = true;
+			event.start();
+		}
+	}
+
+	public void eventFinished() {
+		eventRunning = false;
 	}
 
 }

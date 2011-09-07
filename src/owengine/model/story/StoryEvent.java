@@ -2,11 +2,6 @@ package owengine.model.story;
 
 public interface StoryEvent {
 
-	StoryEvent NULL = new StoryEvent() {
-		@Override
-		public void start() {}
-	};
-
 	class Event {
 	
 		public static int TOLERANCE_INTERVAL = 20;
@@ -24,9 +19,21 @@ public interface StoryEvent {
 				e.printStackTrace();
 			}
 		}
+		
+		/**
+		 * In implementations, this must be called at the end of
+		 * the event's lifetime with the event's map as the argument.
+		 */
+		public static void finish(EventMap map) {
+			map.eventFinished();
+		}
 	
 	}
 
+	/**
+	 * Starts the event.
+	 * @see StoryEvent.Event.finish(EventMap)
+	 */
 	void start();
 
 }
