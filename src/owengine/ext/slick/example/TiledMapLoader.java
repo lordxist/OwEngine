@@ -1,4 +1,4 @@
-package owengine.examples.slickexample;
+package owengine.ext.slick.example;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 import org.newdawn.slick.tiled.TiledMap;
 
+import owengine.ext.slick.ActionAnimationsView;
+import owengine.ext.slick.PcSpritesView;
 import owengine.model.entities.MessageEntity;
 import owengine.model.entities.character.PlayerChar;
 import owengine.model.entities.character.NonPlayerChar;
@@ -45,7 +47,7 @@ public class TiledMapLoader {
 					tiledMap.getObjectY(i, j)/16, msg, loadMoves(tiledMap, i, j));
 			gameMap.addEntity(character);
 			charViews.add(new CharView(character, new ActionAnimationsView(),
-					new PcSpritesView(), 16, pc));
+					new PcSpritesView(), pc));
 			return;
 		/*} else if (type.equals("WarpTile")) {
 			gameMap.putWarpTile(

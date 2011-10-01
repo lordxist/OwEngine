@@ -1,4 +1,4 @@
-package owengine.examples.slickexample;
+package owengine.ext.slick;
 
 import java.util.HashMap;
 
@@ -34,7 +34,7 @@ public class AnimationLoader {
 			throws SlickException {
 		Image[] images = new Image[frames];
 		for (int i = 0; i < frames; i++)
-			images[i] = new Image("owengine/examples/slickexample/res/pc/"+name+"/"+dir+"/"+i+".png");
+			images[i] = new Image("owengine/ext/slick/example/res/pc/"+name+"/"+dir+"/"+i+".png");
 		return new Animation(images, 2*Char.STD_MOVE_SPEED/(frames+1));
 	}
 

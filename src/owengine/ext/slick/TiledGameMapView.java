@@ -1,20 +1,18 @@
-package owengine.examples.slickexample;
+package owengine.ext.slick;
 
 import org.newdawn.slick.tiled.TiledMap;
 
 import owengine.view.GameMapView;
-import owengine.view.PlayerCharView;
 
 public class TiledGameMapView extends GameMapView {
 
 	private TiledMap tiledMap;
 
-	public TiledGameMapView(PlayerCharView pcView, TiledMap tiledMap) {
-		super(pcView);
+	public TiledGameMapView(TiledMap tiledMap) {
 		this.tiledMap = tiledMap;
 	}
 
-	public void renderTiled() {
+	public void render() {
 		tiledMap.render(getScreenX(160),
 				getScreenY(160), 0, 0,
 				160, 160);

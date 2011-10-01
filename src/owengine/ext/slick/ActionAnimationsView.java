@@ -1,4 +1,4 @@
-package owengine.examples.slickexample;
+package owengine.ext.slick;
 
 import org.newdawn.slick.Animation;
 

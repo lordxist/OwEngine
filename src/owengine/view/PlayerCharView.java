@@ -6,19 +6,25 @@ import owengine.view.PcStateView;
 
 public class PlayerCharView extends CharView {
 
+	private int compWidth, compHeight;
+
 	public PlayerCharView(Char pc, PcActionView actionView, PcStateView stateView,
-			int fieldSize) {
-		super(pc, actionView, stateView, fieldSize, pc);
+			int compWidth, int compHeight) {
+		super(pc, actionView, stateView, pc);
+		this.compWidth = compWidth;
+		this.compHeight = compHeight;
 	}
 
-	public void draw(int compWidth, int compHeight) {
+	public void draw() {
 		if (character.isInactive()) {
 			actionView.finishCurrentView();
 			stateView.draw("stand_"+character.getPos().getDir(),
 					compWidth/2, compHeight/2);
-		} else actionView.drawCurrentView(
+		} else {
+			actionView.drawCurrentView(
 				character.getActionType()+"_"+character.getPos().getDir(),
 				compWidth/2, compHeight/2);
+		}
 	}
 
 }

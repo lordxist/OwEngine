@@ -13,5 +13,10 @@
   <object x="240" y="16" width="16" height="80"/>
   <object x="96" y="0" width="144" height="16"/>
   <object x="80" y="16" width="16" height="80"/>
+  <object type="Signpost" x="352" y="80" width="16" height="16">
+   <properties>
+    <property name="msg" value="Hello World!"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

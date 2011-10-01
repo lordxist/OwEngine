@@ -1,4 +1,4 @@
-package owengine.examples.slickexample;
+package owengine.ext.slick;
 
 import java.util.HashMap;
 
@@ -14,7 +14,7 @@ public class PcSpritesView implements PcStateView {
 
 	public static void init() throws SlickException {
 		for (MoveDir dir : MoveDir.values()) {
-			pcSprites.put("stand_"+dir, new Image("owengine/examples/slickexample/res/pc/move/"+dir+"/0.png"));
+			pcSprites.put("stand_"+dir, new Image("owengine/ext/slick/example/res/pc/move/"+dir+"/0.png"));
 		}
 	}
 
