@@ -3,6 +3,7 @@ package owengine.model.story;
 import java.awt.Point;
 import java.util.HashMap;
 
+import owengine.model.entities.character.PlayerChar;
 import owengine.model.map.Entity;
 import owengine.model.map.EntityMap;
 
@@ -12,8 +13,8 @@ public class EventMap extends EntityMap {
 	private Entity player;
 	private boolean eventRunning;
 
-	public EventMap(Entity player) {
-		this.player = player;
+	public EventMap() {
+		player = PlayerChar.getInstance();
 	}
 
 	public void addEventTile(int x, int y, StoryEvent event) {

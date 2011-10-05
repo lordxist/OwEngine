@@ -14,6 +14,10 @@ public class PlayerChar extends Char  {
 
 	private ArrayList<String> currentMessage;
 
+	public PlayerChar() {
+		instance = this;
+	}
+
 	public PlayerChar(EntityMap map, int x, int y) {
 		super(map, x, y);
 		instance = this;

@@ -2,16 +2,18 @@ package owengine.model.entities;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import owengine.meta.Params;
 import owengine.model.map.BasicEntity;
 
 public class MessageEntity extends BasicEntity {
 
 	private Point pos;
 
-	public MessageEntity(int x, int y, ArrayList<String> msg) {
-		super(msg);
-		pos = new Point(x, y);
+	@Params(names = {"msg"})
+	public MessageEntity(String msg) {
+		super(new ArrayList<String>(Arrays.asList(msg.split("\\\\n"))));
 	}
 
 	@Override

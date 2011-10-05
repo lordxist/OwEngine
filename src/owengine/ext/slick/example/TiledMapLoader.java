@@ -31,8 +31,7 @@ public class TiledMapLoader {
 			ArrayList<String> msg = new ArrayList<String>(
 				Arrays.asList(tiledMap.getObjectProperty(i, j, "msg", "").split("\\\\n"))
 			);
-			gameMap.addEntity(new MessageEntity(tiledMap.getObjectX(i, j)/16,
-					tiledMap.getObjectY(i, j)/16, msg));
+			gameMap.addEntity(new MessageEntity(msg.get(0)));
 			return;
 		} else if (type.equals("NonPlayerChar")) {
 			int id = Integer.parseInt(tiledMap.getObjectProperty(i, j, "id", null));
@@ -41,13 +40,11 @@ public class TiledMapLoader {
 			);
 			NonPlayerChar character;
 			if (tiledMap.getObjectProperty(i, j, "path", null) == null)
-				character = new NonPlayerChar(id, gameMap, tiledMap.getObjectX(i, j)/16,
-					tiledMap.getObjectY(i, j)/16, msg);
-			else character = new NonPlayerChar(id, gameMap, tiledMap.getObjectX(i, j)/16,
-					tiledMap.getObjectY(i, j)/16, msg, loadMoves(tiledMap, i, j));
+				character = new NonPlayerChar(id, msg);
+			else character = new NonPlayerChar(id, msg, loadMoves(tiledMap, i, j));
 			gameMap.addEntity(character);
 			charViews.add(new CharView(character, new ActionAnimationsView(),
-					new PcSpritesView(), pc));
+					new PcSpritesView()));
 			return;
 		/*} else if (type.equals("WarpTile")) {
 			gameMap.putWarpTile(

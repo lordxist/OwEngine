@@ -11,6 +11,10 @@ public abstract class MobileEntity extends ActionEntity implements Movable, Dire
 
 	private MovablePosition movablePos;
 
+	public MobileEntity(MoveDir dir, int speed) {
+		this.movablePos = new MovablePosition(this, null, 0, 0, dir, speed);
+	}
+
 	public MobileEntity(Point pos, EntityMap map, MoveDir dir, int speed) {
 		this.movablePos = new MovablePosition(this, map, pos.x, pos.y, dir, speed);
 	}

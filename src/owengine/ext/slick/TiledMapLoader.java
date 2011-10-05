@@ -4,14 +4,25 @@ import java.awt.Point;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.tiled.TiledMap;
 
 import owengine.MapLoader;
+import owengine.meta.Params;
+import owengine.meta.View;
+import owengine.model.entities.character.NonPlayerChar;
+import owengine.model.map.DoorTile;
 import owengine.model.map.Entity;
 import owengine.model.map.EntityMap;
+import owengine.model.map.MoveDir;
+import owengine.model.map.WarpTile;
+import owengine.model.story.EventMap;
+import owengine.model.story.StoryEvent;
+import owengine.view.CharView;
 import owengine.view.GameMapView;
 
 import static owengine.ext.slick.Utilities.*;
@@ -19,6 +30,7 @@ import static owengine.ext.slick.Utilities.*;
 public class TiledMapLoader implements MapLoader {
 
 	private String modelPackage, viewPackage, mapsPackage;
+	private HashMap<String, EventMap> maps = new HashMap<String, EventMap>();
 
 	public void setModel(String modelPackage) {
 		this.modelPackage = modelPackage;
@@ -32,16 +44,17 @@ public class TiledMapLoader implements MapLoader {
 		this.mapsPackage = mapsPackage;
 	}
 
-	public <T extends owengine.view.View> HashMap<String, EntityMap> loadMaps(ArrayList<T> views,
+	public HashMap<String, EventMap> loadMaps(ArrayList<owengine.view.View> views,
 			HashMap<EntityMap, GameMapView> mapViews) {
-		HashMap<String, EntityMap> maps = new HashMap<String, EntityMap>();
 		HashMap<String, TiledMap> tiled = loadTiledFromPackage();
 		
 		for (String name : tiled.keySet()) {
-			EntityMap map = new EntityMap();
-			loadMap(tiled.get(name), map, views);
+			EventMap map = new EventMap();
 			maps.put(name, map);
 			mapViews.put(map, new TiledGameMapView(tiled.get(name)));
+		}
+		for (Map.Entry<String, EventMap> entry : maps.entrySet()) {
+			loadMap(tiled.get(entry.getKey()), entry.getValue(), views);
 		}
 		return maps;
 	}
@@ -61,16 +74,16 @@ public class TiledMapLoader implements MapLoader {
 		return tileds;
 	}
 
-	public <T extends owengine.view.View> void loadMap(
-			TiledMap tiledMap, EntityMap map, ArrayList<T> views) {
+	public void loadMap(
+			TiledMap tiledMap, EventMap map, ArrayList<owengine.view.View> views) {
 		for (int i = 0; i < tiledMap.getObjectGroupCount(); i++)
 			for (int j = 0; j < tiledMap.getObjectCount(i); j++)
 				loadObject(tiledMap, i, j, map, views);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends owengine.view.View> void loadObject(
-			TiledMap tiledMap, int i, int j, EntityMap map, ArrayList<T> views) {
+	public void loadObject(
+			TiledMap tiledMap, int i, int j, EventMap map, ArrayList<owengine.view.View> views) {
 		String type = tiledMap.getObjectType(i, j);
 		if (type == "") {
 			for (int x = 0; x < tiledMap.getObjectWidth(i, j)/16; x++) {
@@ -82,9 +95,54 @@ public class TiledMapLoader implements MapLoader {
 			}
 			return;
 		}
+		Point pos = new Point(tiledMap.getObjectX(i, j)/16,
+				tiledMap.getObjectY(i, j)/16);
+		if (type.equals("WarpTile")) {
+			Point targetPos = new Point(
+				Integer.parseInt(tiledMap.getObjectProperty(i, j, "target_x", null)),
+				Integer.parseInt(tiledMap.getObjectProperty(i, j, "target_y", null)));
+			WarpTile warp = new WarpTile(targetPos,
+					maps.get(tiledMap.getObjectProperty(i, j, "target_map", null)));
+			map.putWarpTile(pos, warp);
+			return;
+		}
+		if (type.equals("DoorTile")) {
+			Point targetPos = new Point(
+				Integer.parseInt(tiledMap.getObjectProperty(i, j, "target_x", null)),
+				Integer.parseInt(tiledMap.getObjectProperty(i, j, "target_y", null)));
+			DoorTile warp = new DoorTile(targetPos,
+					maps.get(tiledMap.getObjectProperty(i, j, "target_map", null)),
+					MoveDir.valueOf(tiledMap.getObjectProperty(i, j, "dir", null)));
+			map.putDoorTile(pos, warp);
+			return;
+		}
+		if (type.equals("NonPlayerChar")) {
+			int id = Integer.parseInt(tiledMap.getObjectProperty(i, j, "id", null));
+			ArrayList<String> msg = new ArrayList<String>(
+				Arrays.asList(tiledMap.getObjectProperty(i, j, "msg", "").split("\\\\n"))
+			);
+			NonPlayerChar character;
+			if (tiledMap.getObjectProperty(i, j, "path", null) == null)
+				character = new NonPlayerChar(id, msg);
+			else character = new NonPlayerChar(id, msg, loadMoves(tiledMap, i, j));
+			map.addEntity(pos, character);
+			views.add(new CharView(character, new ActionAnimationsView(),
+					new PcSpritesView()));
+			return;
+		}
 		try {
-			Class<?> klass = Class.forName(modelPackage+"."+type);
+			Class<?> klass;
+			try {
+				klass = Class.forName(modelPackage+"."+type);
+			} catch (Exception e) {
+				klass = Class.forName("owengine.model.entities."+type);
+			}
 			Constructor<?> constr = klass.getConstructors()[0];
+			if (Arrays.asList(klass.getInterfaces()).contains(StoryEvent.class)) {
+				StoryEvent event = (StoryEvent) constr.newInstance(map);
+				map.addEventTile(pos.x, pos.y, event);
+				return;
+			}
 			Class<?>[] paramTypes = constr.getParameterTypes();
 			Object[] params = new Object[paramTypes.length];
 			int k = 0;
@@ -98,16 +156,26 @@ public class TiledMapLoader implements MapLoader {
 				k++;
 			}
 			Entity entity = (Entity) constr.newInstance(params);
-			map.addEntity(entity);
+			map.addEntity(pos, entity);
 			String viewType = viewPackage+".";
 			if (klass.isAnnotationPresent(View.class)) {
 				viewType += klass.getAnnotation(View.class).name();
 			} else {
 				viewType += type+"View";
 			}
-			T view = (T) Class.forName(viewType).getConstructors()[0].newInstance(entity);
+			owengine.view.View view = (owengine.view.View) Class.forName(viewType).getConstructors()[0].newInstance(entity);
 			views.add(view);
 		} catch (Exception e) {e.printStackTrace();}
+	}
+
+	private static ArrayList<Point> loadMoves(TiledMap tiledMap, int i, int j) {
+		ArrayList<Point> moves = new ArrayList<Point>();
+		for (String p : tiledMap.getObjectProperty(i, j, "path", null).split(",")) {
+			String[] coords = p.split(":");
+			moves.add(new Point(Integer.parseInt(coords[0]),
+					Integer.parseInt(coords[1])));
+		}
+		return moves;
 	}
 
 }

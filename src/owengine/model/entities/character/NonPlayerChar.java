@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import owengine.controller.ControlledMovable;
-import owengine.model.map.EntityMap;
 
 public class NonPlayerChar extends Char implements ControlledMovable {
 
@@ -19,19 +18,17 @@ public class NonPlayerChar extends Char implements ControlledMovable {
 	private ArrayList<Point> moves;
 	private ArrayList<String> msg;
 
-	public NonPlayerChar(int id, EntityMap map, int x, int y,
-			ArrayList<String> msg) {
-		super(map, x, y);
+	public NonPlayerChar(int id, ArrayList<String> msg, ArrayList<Point> moves) {
+		this(id, msg);
+		this.moves = moves;
+	}
+
+	public NonPlayerChar(int id, ArrayList<String> msg) {
+		super();
 		this.msg = msg;
 		setTurning(false);
 		setBumping(false);
 		instances.put(id, this);
-	}
-
-	public NonPlayerChar(int id, EntityMap map, int x, int y,
-			ArrayList<String> msg, ArrayList<Point> moves) {
-		this(id, map, x, y, msg);
-		this.moves = moves;
 	}
 
 	@Override

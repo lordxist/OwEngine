@@ -4,8 +4,12 @@ import org.newdawn.slick.Graphics;
 
 import owengine.view.View;
 
-public interface SlickGraphicsView extends View {
+public abstract class SlickGraphicsView implements View {
 
-	void setGraphics(Graphics g);
+	protected static Graphics g;
+
+	public static void setGraphics(Graphics g) {
+		SlickGraphicsView.g = g;
+	}
 
 }

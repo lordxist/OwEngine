@@ -1,10 +1,11 @@
 package owengine.view;
 
 import owengine.model.entities.character.Char;
+import owengine.model.entities.character.PlayerChar;
 import owengine.view.PcActionView;
 import owengine.view.PcStateView;
 
-public class CharView {
+public class CharView implements View {
 
 	protected static int fieldSize;
 
@@ -21,10 +22,9 @@ public class CharView {
 	protected PcActionView actionView;
 	protected PcStateView stateView;
 
-	public CharView(Char character, PcActionView actionView, PcStateView stateView,
-			Char pc) {
+	public CharView(Char character, PcActionView actionView, PcStateView stateView) {
 		this.character = character;
-		this.pc = pc;
+		this.pc = PlayerChar.getInstance();
 		this.actionView = actionView;
 		this.stateView = stateView;
 	}

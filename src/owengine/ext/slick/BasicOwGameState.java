@@ -2,26 +2,28 @@ package owengine.ext.slick;
 
 import java.awt.Point;
 
-import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.state.BasicGameState;
+import org.newdawn.slick.state.StateBasedGame;
 
 import owengine.OwEngine;
 import owengine.model.entities.character.PlayerChar;
 import owengine.view.CharView;
 
-public abstract class BasicOwGame extends BasicGame {
+public abstract class BasicOwGameState extends BasicGameState {
 
 	protected OwEngine<SlickGraphicsView> engine = new OwEngine<SlickGraphicsView>();
 	protected PlayerChar pc;
 	protected String mapsFolder, modelPackage, viewPackage, startMap;
 	protected Point startPos;
+	protected int stateId = -1;
 
-	public BasicOwGame(String title, String mapsFolder, String modelPackage,
+	public BasicOwGameState(int stateId, String mapsFolder, String modelPackage,
 			String viewPackage, String startMap, Point startPos) {
-		super(title);
+		this.stateId = stateId;
 		this.mapsFolder = mapsFolder;
 		this.modelPackage = modelPackage;
 		this.viewPackage = viewPackage;
@@ -30,7 +32,13 @@ public abstract class BasicOwGame extends BasicGame {
 	}
 
 	@Override
-	public void init(GameContainer gc) throws SlickException {		
+	public int getID() {
+		return stateId;
+	}
+
+	@Override
+	public void init(GameContainer gc, StateBasedGame sbg)
+			throws SlickException {
 		engine.setMapsPackage(mapsFolder);
 		engine.setModel(modelPackage);
 		engine.setView(viewPackage);
@@ -41,7 +49,6 @@ public abstract class BasicOwGame extends BasicGame {
 		engine.setStartPosition(startPos, startMap);
 		pc = PlayerChar.getInstance();
 		
-		SlickGraphicsView.setGraphics(gc.getGraphics());
 		CharView.setFieldSize(16);
 		AnimationLoader.init();
 		PcSpritesView.init();
@@ -49,17 +56,18 @@ public abstract class BasicOwGame extends BasicGame {
 	}
 
 	@Override
-	public void update(GameContainer gc, int delta) {		
-		engine.update(delta);
-		
-		handleKeyboardInput(gc.getInput());
-	}
-
-	protected abstract void handleKeyboardInput(Input input);
-
-	@Override
-	public void render(GameContainer gc, Graphics g) throws SlickException {
+	public void render(GameContainer gc, StateBasedGame sbg, Graphics g)
+			throws SlickException {
 		engine.render(160, 160);
 	}
+
+	@Override
+	public void update(GameContainer gc, StateBasedGame sbg, int delta) {
+		engine.update(delta);
+		
+		handleKeyboardInput(gc.getInput(), sbg);
+	}
+
+	protected abstract void handleKeyboardInput(Input input, StateBasedGame sbg);
 
 }

@@ -10,7 +10,7 @@ public class PlayerCharView extends CharView {
 
 	public PlayerCharView(Char pc, PcActionView actionView, PcStateView stateView,
 			int compWidth, int compHeight) {
-		super(pc, actionView, stateView, pc);
+		super(pc, actionView, stateView);
 		this.compWidth = compWidth;
 		this.compHeight = compHeight;
 	}
