@@ -3,6 +3,7 @@ package owengine.model.story;
 public abstract class RunnableStoryEvent implements StoryEvent, Runnable {
 
 	private EventMap map;
+	private boolean paused;
 
 	public RunnableStoryEvent(EventMap map) {
 		this.map = map;
@@ -20,5 +21,26 @@ public abstract class RunnableStoryEvent implements StoryEvent, Runnable {
 	}
 
 	public abstract void runEvent();
+
+	/**
+	 * Use this instead of StoryEvent.Event.pause(int)
+	 */
+	protected void pause(int millis) {
+		synchronized (this) {
+			while (paused) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		Event.pause(millis);
+	}
+
+	@Override
+	public void setPaused(boolean paused) {
+		this.paused = paused;
+	}
 
 }

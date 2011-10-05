@@ -36,4 +36,6 @@ public interface StoryEvent {
 	 */
 	void start();
 
+	void setPaused(boolean paused);
+
 }

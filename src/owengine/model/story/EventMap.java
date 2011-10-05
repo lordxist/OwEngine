@@ -12,6 +12,7 @@ public class EventMap extends EntityMap {
 	private HashMap<Point, StoryEvent> eventTiles = new HashMap<Point, StoryEvent>();
 	private Entity player;
 	private boolean eventRunning;
+	private StoryEvent event;
 
 	public EventMap() {
 		player = PlayerChar.getInstance();
@@ -31,7 +32,7 @@ public class EventMap extends EntityMap {
 		if (eventRunning) {
 			return;
 		}
-		StoryEvent event = eventTiles.get(player.getPos());
+		event = eventTiles.get(player.getPos());
 		if (event != null) {
 			eventRunning = true;
 			event.start();
@@ -40,6 +41,23 @@ public class EventMap extends EntityMap {
 
 	public void eventFinished() {
 		eventRunning = false;
+	}
+
+	public void pauseEvents() {
+		if (event != null) {
+			synchronized (event) {
+				event.setPaused(true);
+			}
+		}
+	}
+
+	public void unpauseEvents() {
+		if (event != null) {
+			synchronized (event) {
+				event.setPaused(false);
+				event.notify();
+			}
+		}
 	}
 
 }

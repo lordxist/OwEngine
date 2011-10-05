@@ -11,6 +11,7 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import owengine.OwEngine;
 import owengine.model.entities.character.PlayerChar;
+import owengine.model.story.EventMap;
 import owengine.view.CharView;
 
 public abstract class BasicOwGameState extends BasicGameState {
@@ -34,6 +35,16 @@ public abstract class BasicOwGameState extends BasicGameState {
 	@Override
 	public int getID() {
 		return stateId;
+	}
+	
+	@Override
+	public void enter(GameContainer gc, StateBasedGame sbg) {
+		((EventMap) pc.getMap()).unpauseEvents();
+	}
+
+	@Override
+	public void leave(GameContainer gc, StateBasedGame sbg) {
+		((EventMap) pc.getMap()).pauseEvents();
 	}
 
 	@Override
