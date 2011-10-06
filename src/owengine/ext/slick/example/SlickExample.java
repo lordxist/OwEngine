@@ -17,9 +17,11 @@ public class SlickExample extends BasicOwGame {
 	public static final String VIEW_PACKAGE = "owengine.ext.slick.example";
 	public static final String START_MAP = "map";
 	public static final Point START_POS = new Point(5, 5);
+	public static final String RES_DIR = "owengine/ext/slick/example/res";
 
 	public SlickExample() {
-		super(TITLE, MAPS_FOLDER, MODEL_PACKAGE, VIEW_PACKAGE, START_MAP, START_POS);
+		super(TITLE, MAPS_FOLDER, MODEL_PACKAGE, VIEW_PACKAGE, START_MAP, START_POS,
+				RES_DIR);
 	}
 
 	@Override

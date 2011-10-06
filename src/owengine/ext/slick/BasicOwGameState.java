@@ -20,16 +20,18 @@ public abstract class BasicOwGameState extends BasicGameState {
 	protected PlayerChar pc;
 	protected String mapsFolder, modelPackage, viewPackage, startMap;
 	protected Point startPos;
+	protected String resDir;
 	protected int stateId = -1;
 
 	public BasicOwGameState(int stateId, String mapsFolder, String modelPackage,
-			String viewPackage, String startMap, Point startPos) {
+			String viewPackage, String startMap, Point startPos, String resDir) {
 		this.stateId = stateId;
 		this.mapsFolder = mapsFolder;
 		this.modelPackage = modelPackage;
 		this.viewPackage = viewPackage;
 		this.startMap = startMap;
 		this.startPos = startPos;
+		this.resDir = resDir;
 	}
 
 	@Override
@@ -61,8 +63,8 @@ public abstract class BasicOwGameState extends BasicGameState {
 		pc = PlayerChar.getInstance();
 		
 		CharView.setFieldSize(16);
-		AnimationLoader.init();
-		PcSpritesView.init();
+		AnimationLoader.init(resDir);
+		PcSpritesView.init(resDir);
 		gc.setTargetFrameRate(100);
 	}
 
