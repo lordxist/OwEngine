@@ -1,5 +1,7 @@
 package owengine.model.story;
 
+import java.util.ArrayList;
+
 public interface StoryEvent {
 
 	class Event {
@@ -37,5 +39,13 @@ public interface StoryEvent {
 	void start();
 
 	void setPaused(boolean paused);
+
+	/**
+	 * <p>Messages the player character by calling</p>
+	 * <code>PlayerChar.getInstance().setCurrentMessage(msg)</code>
+	 * <p>in implementations, then pauses the event.</p>
+	 * @see PlayerChar.removeCurrentMessage()
+	 */
+	void message(ArrayList<String> msg);
 
 }

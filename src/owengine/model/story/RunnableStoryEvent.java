@@ -1,6 +1,6 @@
 package owengine.model.story;
 
-public abstract class RunnableStoryEvent implements StoryEvent, Runnable {
+public abstract class RunnableStoryEvent extends BasicStoryEvent implements Runnable {
 
 	private EventMap map;
 	private boolean paused;

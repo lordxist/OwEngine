@@ -52,7 +52,9 @@ public abstract class BasicOwGame extends BasicGame {
 	public void update(GameContainer gc, int delta) {		
 		engine.update(delta);
 		
-		handleKeyboardInput(gc.getInput());
+		if (!InputBlockingEvent.isInputDisabled()) {
+			handleKeyboardInput(gc.getInput());
+		}
 	}
 
 	protected abstract void handleKeyboardInput(Input input);

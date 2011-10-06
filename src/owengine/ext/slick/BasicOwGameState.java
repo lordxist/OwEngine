@@ -76,7 +76,9 @@ public abstract class BasicOwGameState extends BasicGameState {
 	public void update(GameContainer gc, StateBasedGame sbg, int delta) {
 		engine.update(delta);
 		
-		handleKeyboardInput(gc.getInput(), sbg);
+		if (!InputBlockingEvent.isInputDisabled()) {
+			handleKeyboardInput(gc.getInput(), sbg);
+		}
 	}
 
 	protected abstract void handleKeyboardInput(Input input, StateBasedGame sbg);
