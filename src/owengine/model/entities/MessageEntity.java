@@ -4,9 +4,11 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import owengine.meta.NoView;
 import owengine.meta.Params;
 import owengine.model.map.BasicEntity;
 
+@NoView
 public class MessageEntity extends BasicEntity {
 
 	private Point pos;

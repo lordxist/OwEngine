@@ -12,6 +12,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.tiled.TiledMap;
 
 import owengine.MapLoader;
+import owengine.meta.NoView;
 import owengine.meta.Params;
 import owengine.meta.View;
 import owengine.model.entities.character.NonPlayerChar;
@@ -157,6 +158,9 @@ public class TiledMapLoader implements MapLoader {
 			}
 			Entity entity = (Entity) constr.newInstance(params);
 			map.addEntity(pos, entity);
+			if (klass.isAnnotationPresent(NoView.class)) {
+				return;
+			}
 			String viewType = viewPackage+".";
 			if (klass.isAnnotationPresent(View.class)) {
 				viewType += klass.getAnnotation(View.class).name();
