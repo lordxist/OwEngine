@@ -7,7 +7,7 @@ public class Signpost extends MessageEntity {
 
 	@Params(names = {"msg"})
 	public Signpost(String msg) {
-		super(msg);
+		super(null, msg);
 	}
 
 }

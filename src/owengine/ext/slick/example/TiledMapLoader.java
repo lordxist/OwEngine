@@ -31,7 +31,7 @@ public class TiledMapLoader {
 			ArrayList<String> msg = new ArrayList<String>(
 				Arrays.asList(tiledMap.getObjectProperty(i, j, "msg", "").split("\\\\n"))
 			);
-			gameMap.addEntity(new MessageEntity(msg.get(0)));
+			gameMap.addEntity(new MessageEntity(null, msg.get(0)));
 			return;
 		} else if (type.equals("NonPlayerChar")) {
 			int id = Integer.parseInt(tiledMap.getObjectProperty(i, j, "id", null));

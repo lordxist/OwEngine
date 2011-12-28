@@ -12,7 +12,7 @@ public abstract class BasicEntity implements Entity {
 
 	public BasicEntity() {}
 
-	public BasicEntity(ArrayList<String> msg) {
+	public BasicEntity(EntityMap map, ArrayList<String> msg) {
 		this.msg = msg;
 	}
 

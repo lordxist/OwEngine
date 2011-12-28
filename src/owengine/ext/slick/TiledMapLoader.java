@@ -147,6 +147,7 @@ public class TiledMapLoader implements MapLoader {
 			Class<?>[] paramTypes = constr.getParameterTypes();
 			Object[] params = new Object[paramTypes.length];
 			int k = 0;
+			params[k++] = map;
 			for (String name : constr.getAnnotation(Params.class).names()) {
 				params[k] = tiledMap.getObjectProperty(i, j, name, null);
 				if (paramTypes[k].isPrimitive() && paramTypes[k] != Void.TYPE) {

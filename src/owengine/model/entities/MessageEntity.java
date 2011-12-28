@@ -7,6 +7,7 @@ import java.util.Arrays;
 import owengine.meta.NoView;
 import owengine.meta.Params;
 import owengine.model.map.BasicEntity;
+import owengine.model.map.EntityMap;
 
 @NoView
 public class MessageEntity extends BasicEntity {
@@ -14,8 +15,8 @@ public class MessageEntity extends BasicEntity {
 	private Point pos;
 
 	@Params(names = {"msg"})
-	public MessageEntity(String msg) {
-		super(new ArrayList<String>(Arrays.asList(msg.split("\\\\n"))));
+	public MessageEntity(EntityMap map, String msg) {
+		super(map, new ArrayList<String>(Arrays.asList(msg.split("\\\\n"))));
 	}
 
 	@Override
