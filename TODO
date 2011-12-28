@@ -1,6 +1,7 @@
 MODEL:
 - remove controller architecture and rework MovableController into model
   -> and let the map loader load paths for every controlled movable entity
+- change player character to have states
 
 ENGINE:
 - pull out functionality from TiledMapLoader into MapLoader
