@@ -12,6 +12,10 @@ public abstract class Char extends MobileEntity {
 	public static final int STD_MOVE_SPEED = 450;
 	public static final MoveDir STD_MOVE_DIR = MoveDir.down;
 
+	private State state;
+	
+	public interface State { }
+
 	public Char() {
 		super(STD_MOVE_DIR, STD_MOVE_SPEED);
 	}
@@ -23,6 +27,14 @@ public abstract class Char extends MobileEntity {
 	@Override
 	public ArrayList<String> explore() {
 		return null;
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	public void setState(State state) {
+		this.state = state;
 	}
 
 }
