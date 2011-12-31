@@ -39,6 +39,15 @@ public abstract class RunnableStoryEvent extends BasicStoryEvent implements Runn
 		Event.pause(millis);
 	}
 
+	/**
+	 * Convenience method for pause(0).
+	 * Use this before to make external interruption
+	 * possible.
+	 */
+	protected void pause() {
+		pause(0);
+	}
+
 	@Override
 	public void setPaused(boolean paused) {
 		this.paused = paused;
