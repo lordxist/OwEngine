@@ -32,15 +32,23 @@ public class EventMap extends EntityMap {
 		if (eventRunning) {
 			return;
 		}
-		event = eventTiles.get(player.getPos());
+		if (event == null) {
+			event = eventTiles.get(player.getPos());
+		}
 		if (event != null) {
 			eventRunning = true;
 			event.start();
 		}
 	}
 
+	public void eventStarted(StoryEvent event) {
+		this.event = event;
+		eventRunning = true;
+	}
+
 	public void eventFinished() {
 		eventRunning = false;
+		event = null;
 	}
 
 	public void pauseEvents() {

@@ -23,6 +23,14 @@ public interface StoryEvent {
 		}
 		
 		/**
+		 * In implementations, this must be called at the start of
+		 * the event's lifetime with the event's map as first argument.
+		 */
+		public static void start(EventMap map, StoryEvent event) {
+			map.eventStarted(event);
+		}
+		
+		/**
 		 * In implementations, this must be called at the end of
 		 * the event's lifetime with the event's map as the argument.
 		 */

@@ -11,6 +11,7 @@ public abstract class RunnableStoryEvent extends BasicStoryEvent implements Runn
 
 	@Override
 	public void start() {
+		Event.start(map, this);
 		new Thread(this).start();
 	}
 
