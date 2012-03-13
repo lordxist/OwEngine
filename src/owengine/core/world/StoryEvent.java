@@ -18,9 +18,11 @@ public abstract class StoryEvent implements Runnable {
 
 	@Override
 	public void run() {
+		World.getInstance().getInputController().disable();
 		finished = false;
 		runEvent();
 		finished = true;
+		World.getInstance().getInputController().enable();
 	}
 
 	/**

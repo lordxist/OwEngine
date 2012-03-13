@@ -19,8 +19,9 @@ public class World {
 
 	private Entity player;
 	private HashMap<String, GameMap> maps = new HashMap<String, GameMap>();
+	private InputController inputController = InputController.NULL;
 
-	private World() {}
+	protected World() {}
 
 	public Entity getPlayer() {
 		return player;
@@ -48,6 +49,14 @@ public class World {
 
 	public Set<GameMap> getMaps() {
 		return Collections.unmodifiableSet(new HashSet<GameMap>(maps.values()));
+	}
+
+	public InputController getInputController() {
+		return inputController;
+	}
+
+	public void setInputController(InputController inputController) {
+		this.inputController = inputController;
 	}
 
 }

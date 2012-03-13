@@ -4,17 +4,19 @@ import java.awt.Graphics;
 
 import javax.vecmath.Vector2f;
 
+import owengine.core.util.direction.Direction;
 import owengine.core.util.timed.ActionUser;
 import owengine.core.util.timed.TimedAction;
 
 public class Entity implements ActionUser {
 
-	public static final int STD_MOVEMENT_DURATION = 1000;
+	public static final int STD_MOVEMENT_DURATION = 300;
 
 	protected RenderComponent renderComponent;
 	protected int x;
 	protected int y;
 	protected Vector2f deltaPos = new Vector2f(0, 0);
+	protected Direction direction = Direction.south;
 	protected GameMap map;
 	protected String type;
 	protected TimedAction action = TimedAction.NULL_ACTION;
@@ -99,13 +101,23 @@ public class Entity implements ActionUser {
 		return getY()+getDeltaPos().y;
 	}
 
+	public TimedAction getAction() {
+		return action;
+	}
+
 	public void explore() {}
 
-	public void applyMovement(Vector2f dir) {
-		if (map.isBlocked(x+(int)dir.x, y+(int)dir.y)){
+	public void applyMovement(Direction direction) {
+		this.direction = direction;
+		Vector2f vector = direction.getVector();
+		if (map.isBlocked(x+(int)vector.x, y+(int)vector.y)){
 			return;
 		}
-		applyAction(new MovementAction(movementDuration, dir));
+		applyAction(new MovementAction(movementDuration, direction));
+	}
+
+	public Direction getDirection() {
+		return direction;
 	}
 
 }

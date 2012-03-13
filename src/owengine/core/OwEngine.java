@@ -2,14 +2,13 @@ package owengine.core;
 
 import javax.vecmath.Vector2f;
 
-import owengine.core.render.CenterPositionRenderHelper;
-import owengine.core.render.CenteredPositionRenderHelper;
 import owengine.core.world.Entity;
 import owengine.core.world.GameMap;
 import owengine.core.world.MapRenderComponent;
-import owengine.core.world.MapRenderHelper;
 import owengine.core.world.RenderComponent;
 import owengine.core.world.World;
+import owengine.core.world.impl.render.OrthogonalCenteredMapRenderComponent;
+import owengine.core.world.impl.render.OrthogonalCenteredRenderComponent;
 
 public class OwEngine {
 
@@ -47,11 +46,21 @@ public class OwEngine {
 	}
 
 	private void addPlayer(Entity player) {
-		RenderComponent renderComponent = renderFactory.newRenderComponent();
-		renderComponent.setRenderHelper(
-			new CenterPositionRenderHelper(fieldSize, center));
+		RenderComponent renderComponent = newRenderComponent();
 		player.setRenderComponent(renderComponent);
 		World.getInstance().setPlayer(player);
+	}
+
+	private RenderComponent newRenderComponent() {
+		RenderComponent renderComponent = renderFactory.newRenderComponent();
+		if (renderComponent instanceof OrthogonalCenteredRenderComponent) {
+			OrthogonalCenteredRenderComponent ocRenderComponent =
+				(OrthogonalCenteredRenderComponent) renderComponent;
+			ocRenderComponent.setCenter(center);
+			ocRenderComponent.setFieldSize(fieldSize);
+			ocRenderComponent.setCenterEntity(World.getInstance().getPlayer());
+		}
+		return renderComponent;
 	}
 
 	public void setMapLoader(MapLoader mapLoader) {
@@ -67,27 +76,31 @@ public class OwEngine {
 		for (String mapName : mapNames) {
 			GameMap map = mapFactory.newGameMap();
 			mapLoader.load(mapName, map);
+			map.setRenderComponent(newMapRenderComponent());
 			World.getInstance().addMapWithName(mapName, map);
 		}
 		
+		Entity player = World.getInstance().getPlayer();
 		GameMap startMap = World.getInstance().getMapByName(startMapName);
-		startMap.addEntity(World.getInstance().getPlayer());
-		MapRenderComponent renderComponent = mapRenderFactory.newMapRenderComponent();
-		renderComponent.setRenderHelper(new MapRenderHelper(fieldSize, width, height));
-		startMap.setRenderComponent(renderComponent);
+		startMap.addEntity(player);
 		
 		for (GameMap map : World.getInstance().getMaps()) {
 			for (Entity entity : map.getEntities()) {
-				setupEntityRenderComponent(entity);
+				entity.setRenderComponent(newRenderComponent());
 			}
 		}
 	}
 
-	private void setupEntityRenderComponent(Entity entity) {
-		RenderComponent renderComponent = renderFactory.newRenderComponent();
-		renderComponent.setRenderHelper(
-			new CenteredPositionRenderHelper(fieldSize, World.getInstance().getPlayer(), center));
-		entity.setRenderComponent(renderComponent);
+	private MapRenderComponent newMapRenderComponent() {
+		MapRenderComponent renderComponent = mapRenderFactory.newMapRenderComponent();
+		if (renderComponent instanceof OrthogonalCenteredMapRenderComponent) {
+			OrthogonalCenteredMapRenderComponent ocRenderComponent =
+				(OrthogonalCenteredMapRenderComponent) renderComponent;
+			ocRenderComponent.setFieldSize(fieldSize);
+			ocRenderComponent.setHeight(height);
+			ocRenderComponent.setWidth(width);
+		}
+		return renderComponent;
 	}
 
 }

@@ -11,6 +11,7 @@ import javax.vecmath.Vector2d;
 public class GameMap {
 
 	private Set<Entity> entities = new HashSet<Entity>();
+	private Set<Vector2d> blocked = new HashSet<Vector2d>();
 	private HashMap<Vector2d, StoryEvent> events = new HashMap<Vector2d, StoryEvent>();
 	private StoryEvent event = StoryEvent.NULL_EVENT;
 	private MapRenderComponent renderComponent;
@@ -18,6 +19,10 @@ public class GameMap {
 	public void addEntity(Entity e) {
 		e.setMap(this);
 		entities.add(e);
+	}
+
+	public void block(Vector2d point) {
+		blocked.add(point);
 	}
 
 	public void addEvent(Vector2d pos, StoryEvent event) {
@@ -36,10 +41,18 @@ public class GameMap {
 			e.update(delta);
 		}
 		
+		Entity player = World.getInstance().getPlayer();
+		if (player != null) {
+			playerUpdate(player);
+		}
+		
+	}
+
+	private void playerUpdate(Entity player) {
 		if (!event.isFinished()) {
 			return;
 		}
-		Entity player = World.getInstance().getPlayer();
+		
 		StoryEvent event = events.get(new Vector2d(player.getX(), player.getY()));
 		if (event != null) {
 			this.event = event;
@@ -48,6 +61,9 @@ public class GameMap {
 	}
 
 	public boolean isBlocked(int x, int y) {
+		if (blocked.contains(new Vector2d(x, y))) {
+			return true;
+		}		
 		for (Entity e : entities) {
 			if (e.getX() == x && e.getY() == y) {
 				return true;

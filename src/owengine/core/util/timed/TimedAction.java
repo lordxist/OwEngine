@@ -4,11 +4,13 @@ public abstract class TimedAction {
 
 	public static final TimedAction NULL_ACTION = new NullAction();
 
+	protected String name;
 	protected int time;
 	protected int duration;
 	protected boolean finished;
 
-	public TimedAction(int duration) {
+	public TimedAction(String name, int duration) {
+		this.name = name;
 		this.duration = duration;
 	}
 
@@ -28,6 +30,22 @@ public abstract class TimedAction {
 	}
 
 	public abstract void updateAction(float delta);
+
+	public String getName() {
+		return name;
+	}
+
+	public int getTime() {
+		return time;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public float getDelta() {
+		return ((float)time)/duration;
+	}
 
 	public boolean isFinished() {
 		return finished;

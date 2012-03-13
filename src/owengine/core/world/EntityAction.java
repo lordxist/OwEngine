@@ -6,11 +6,11 @@ public abstract class EntityAction extends TimedAction {
 
 	protected Entity entity;
 
-	public EntityAction(int duration) {
-		super(duration);
+	public EntityAction(String name, int duration) {
+		super(name, duration);
 	}
 
-	public void setEntity(Entity entity) {
+	void setEntity(Entity entity) {
 		this.entity = entity;
 	}
 

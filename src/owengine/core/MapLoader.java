@@ -2,10 +2,12 @@ package owengine.core;
 
 import owengine.core.world.GameMap;
 
-public interface MapLoader {
+public abstract class MapLoader {
 
-	void load(String mapName, GameMap gameMap);
+	public abstract void load(String mapName, GameMap gameMap);
 
-	String[] getMapNames();
+	public abstract String[] getMapNames();
+
+	
 
 }

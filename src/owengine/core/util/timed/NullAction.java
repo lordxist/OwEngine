@@ -1,9 +1,9 @@
 package owengine.core.util.timed;
 
-class NullAction extends TimedAction {
+public class NullAction extends TimedAction {
 
 	public NullAction() {
-		super(0);
+		super(null, 0);
 	}
 
 	@Override
