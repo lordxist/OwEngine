@@ -51,6 +51,11 @@ public abstract class TimedAction {
 		return finished;
 	}
 
-	protected abstract void finish();
+	protected void finish() {}
+
+	@Override
+	public String toString() {
+		return name;
+	}
 
 }

@@ -24,14 +24,12 @@ public abstract class OrthogonalCenteredRenderComponent extends RenderComponent 
 	}
 
 	public int getX() {
-		float x = entity.getXf();
-		x -= (centerEntity.getX()+centerEntity.getDeltaPos().x);
+		float x = entity.getExactPos().x - centerEntity.getExactPos().x;
 		return (int)((center.x+x)*fieldSize);
 	}
 
 	public int getY() {
-		float y = entity.getYf();
-		y -= (centerEntity.getY()+centerEntity.getDeltaPos().y);
+		float y = entity.getExactPos().y - centerEntity.getExactPos().y;
 		return (int)((center.y+y)*fieldSize);
 	}
 

@@ -1,6 +1,6 @@
 package owengine.core.util.direction;
 
-import javax.vecmath.Vector2f;
+import java.awt.Point;
 
 public enum Direction {
 
@@ -9,13 +9,13 @@ public enum Direction {
 	north(0, -1),
 	south(0, 1);
 
-	private Vector2f vector;
+	private Point vector;
 
 	Direction(int x, int y) {
-		vector = new Vector2f(x, y);
+		vector = new Point(x, y);
 	}
 
-	public Vector2f getVector() {
+	public Point getVector() {
 		return vector;
 	}
 

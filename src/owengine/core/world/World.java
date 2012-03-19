@@ -19,7 +19,7 @@ public class World {
 
 	private Entity player;
 	private HashMap<String, GameMap> maps = new HashMap<String, GameMap>();
-	private InputController inputController = InputController.NULL;
+	private HashSet<Controller> controllers = new HashSet<Controller>();
 
 	protected World() {}
 
@@ -36,6 +36,9 @@ public class World {
 	}
 
 	public void update(int delta) {
+		for (Controller controller : controllers) {
+			controller.update(delta);
+		}
 		player.getMap().update(delta);
 	}
 
@@ -51,12 +54,26 @@ public class World {
 		return Collections.unmodifiableSet(new HashSet<GameMap>(maps.values()));
 	}
 
-	public InputController getInputController() {
-		return inputController;
+	public void addController(Controller controller) {
+		controllers.add(controller);
 	}
 
-	public void setInputController(InputController inputController) {
-		this.inputController = inputController;
+	public void disableControllers() {
+		for (Controller controller : controllers) {
+			controller.disable();
+		}
+		player.getMap().disableControllers();
+	}
+
+	public void enableControllers() {
+		for (Controller controller : controllers) {
+			controller.enable();
+		}
+		player.getMap().enableControllers();
+	}
+
+	public Set<Controller> getControllers() {
+		return Collections.unmodifiableSet(controllers);
 	}
 
 }

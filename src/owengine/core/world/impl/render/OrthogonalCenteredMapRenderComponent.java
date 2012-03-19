@@ -27,11 +27,11 @@ public abstract class OrthogonalCenteredMapRenderComponent extends MapRenderComp
 	}
 
 	protected int getX() {
-		return (int)(-world.getPlayer().getXf()*getFieldSize());
+		return (int)(-world.getPlayer().getExactPos().x*getFieldSize());
 	}
 
 	protected int getY() {
-		return (int)(-world.getPlayer().getYf()*getFieldSize());
+		return (int)(-world.getPlayer().getExactPos().y*getFieldSize());
 	}
 
 	protected int getHeight() {

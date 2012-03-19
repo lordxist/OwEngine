@@ -1,5 +1,7 @@
 package owengine.core.world;
 
+import java.util.HashMap;
+
 import owengine.core.util.timed.ActionUser;
 
 public abstract class StoryEvent implements Runnable {
@@ -14,21 +16,39 @@ public abstract class StoryEvent implements Runnable {
 		}
 	};
 
+	private static HashMap<String, StoryEvent> events = new HashMap<String, StoryEvent>();
+
+	public static StoryEvent getEvent(String name) {
+		return events.get(name);
+	}
+
+	private StoryEvent() {}
+
+	public StoryEvent(String name) {
+		events.put(name, this);
+		this.name = name;
+	}
+
+	private String name;
 	private boolean finished;
 
 	@Override
-	public void run() {
-		World.getInstance().getInputController().disable();
+	public synchronized void run() {
+		World.getInstance().disableControllers();
 		finished = false;
 		runEvent();
 		finished = true;
-		World.getInstance().getInputController().enable();
+		World.getInstance().enableControllers();
 	}
 
 	/**
 	 * Here goes what happens during the event.
 	 */
 	public abstract void runEvent();
+
+	public String getName() {
+		return name;
+	}
 
 	public boolean isFinished() {
 		return finished;
@@ -37,8 +57,10 @@ public abstract class StoryEvent implements Runnable {
 	protected void pauseForAction(ActionUser actionUser) {
 		while (!actionUser.isActionFinished()) {
 			try {
-				Thread.sleep(20);
-			} catch (InterruptedException e) {}
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -12,87 +12,92 @@ import owengine.core.world.impl.render.OrthogonalCenteredRenderComponent;
 
 public class OwEngine {
 
-	public interface RenderFactory {
-		RenderComponent newRenderComponent();
+	public interface Factory<T> {
+	
+		T createNew();
+	
 	}
 
-	public interface MapRenderFactory {
-		MapRenderComponent newMapRenderComponent();
-	}
+	public static class Producer<T> implements Factory<T> {
+			
+		public static class IllegalProducerClassException extends RuntimeException {
 
-	public interface MapFactory {
-		GameMap newGameMap();
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -5633555190374897326L;
+
+		}
+		
+		private Class<? extends T> clazz;
+		
+		public Producer(Class<? extends T> clazz) {
+			this.clazz = clazz;
+		}
+		
+		@Override
+		public T createNew() {
+			try {
+				return clazz.newInstance();
+			} catch (InstantiationException e) {
+				throw new IllegalProducerClassException();
+			} catch (IllegalAccessException e) {
+				throw new IllegalProducerClassException();
+			}
+		}
+	
 	}
 
 	private int fieldSize;
 	private int width;
 	private int height;
 	private Vector2f center;
-	private RenderFactory renderFactory;
-	private MapRenderFactory mapRenderFactory;
 	private String startMapName;
-	private MapFactory mapFactory;
 	private MapLoader mapLoader;
+	private Class<? extends RenderComponent> renderClass;
+	private Class<? extends MapRenderComponent> mapRenderClass;
+	private Class<? extends GameMap> mapClass = GameMap.class;
+	private Factory<RenderComponent> renderFactory =
+		new Producer<RenderComponent>(renderClass);
+	private Factory<MapRenderComponent> mapRenderFactory =
+		new Producer<MapRenderComponent>(mapRenderClass);
+	private Factory<GameMap> mapFactory = new Producer<GameMap>(mapClass);
+	private World world = World.getInstance();
 
-	public OwEngine(int fieldSize, int width, int height, Vector2f center, Entity player, RenderFactory renderFactory, MapRenderFactory mapRenderFactory, MapFactory mapFactory) {
-		this.fieldSize = fieldSize;
-		this.width = width;
-		this.height = height;
-		this.center = center;
-		this.renderFactory = renderFactory;
-		this.mapRenderFactory = mapRenderFactory;
-		this.mapFactory = mapFactory;
-		addPlayer(player);
-	}
-
-	private void addPlayer(Entity player) {
-		RenderComponent renderComponent = newRenderComponent();
-		player.setRenderComponent(renderComponent);
-		World.getInstance().setPlayer(player);
-	}
-
-	private RenderComponent newRenderComponent() {
-		RenderComponent renderComponent = renderFactory.newRenderComponent();
-		if (renderComponent instanceof OrthogonalCenteredRenderComponent) {
-			OrthogonalCenteredRenderComponent ocRenderComponent =
-				(OrthogonalCenteredRenderComponent) renderComponent;
-			ocRenderComponent.setCenter(center);
-			ocRenderComponent.setFieldSize(fieldSize);
-			ocRenderComponent.setCenterEntity(World.getInstance().getPlayer());
-		}
-		return renderComponent;
-	}
-
-	public void setMapLoader(MapLoader mapLoader) {
-		this.mapLoader = mapLoader;
-	}
-
-	public void setStartMap(String startMapName) {
-		this.startMapName = startMapName;
-	}
-
-	public void load() {
+	public void loadMaps() {
 		String[] mapNames = mapLoader.getMapNames();
 		for (String mapName : mapNames) {
-			GameMap map = mapFactory.newGameMap();
+			GameMap map = mapFactory.createNew();
 			mapLoader.load(mapName, map);
 			map.setRenderComponent(newMapRenderComponent());
-			World.getInstance().addMapWithName(mapName, map);
+			world.addMapWithName(mapName, map);
 		}
 		
-		Entity player = World.getInstance().getPlayer();
-		GameMap startMap = World.getInstance().getMapByName(startMapName);
+		Entity player = world.getPlayer();
+		GameMap startMap = world.getMapByName(startMapName);
 		startMap.addEntity(player);
 		
-		for (GameMap map : World.getInstance().getMaps()) {
+		for (GameMap map : world.getMaps()) {
 			for (Entity entity : map.getEntities()) {
 				entity.setRenderComponent(newRenderComponent());
 			}
 		}
 	}
 
+	private RenderComponent newRenderComponent() {
+		RenderComponent renderComponent = renderFactory.createNew();
+		if (renderComponent instanceof OrthogonalCenteredRenderComponent) {
+			OrthogonalCenteredRenderComponent ocRenderComponent =
+				(OrthogonalCenteredRenderComponent) renderComponent;
+			ocRenderComponent.setCenter(center);
+			ocRenderComponent.setFieldSize(fieldSize);
+			ocRenderComponent.setCenterEntity(world.getPlayer());
+		}
+		return renderComponent;
+	}
+
 	private MapRenderComponent newMapRenderComponent() {
-		MapRenderComponent renderComponent = mapRenderFactory.newMapRenderComponent();
+		MapRenderComponent renderComponent = mapRenderFactory.createNew();
 		if (renderComponent instanceof OrthogonalCenteredMapRenderComponent) {
 			OrthogonalCenteredMapRenderComponent ocRenderComponent =
 				(OrthogonalCenteredMapRenderComponent) renderComponent;
@@ -101,6 +106,115 @@ public class OwEngine {
 			ocRenderComponent.setWidth(width);
 		}
 		return renderComponent;
+	}
+
+	public void addEntity(Entity entity, GameMap map) {
+		map.addEntity(entity);
+		entity.setRenderComponent(newRenderComponent());
+	}
+
+	public Class<? extends RenderComponent> getRenderClass() {
+		return renderClass;
+	}
+
+	public void setRenderClass(Class<? extends RenderComponent> renderClass) {
+		this.renderClass = renderClass;
+	}
+
+	public Class<? extends MapRenderComponent> getMapRenderClass() {
+		return mapRenderClass;
+	}
+
+	public void setMapRenderClass(Class<? extends MapRenderComponent> mapRenderClass) {
+		this.mapRenderClass = mapRenderClass;
+	}
+
+	public Class<? extends GameMap> getMapClass() {
+		return mapClass;
+	}
+
+	public void setMapClass(Class<? extends GameMap> mapClass) {
+		this.mapClass = mapClass;
+	}
+
+	public void setPlayer(Entity player) {
+		world.setPlayer(player);
+	}
+
+	public void setStartMap(String startMapName) {
+		this.startMapName = startMapName;
+	}
+
+	public int getFieldSize() {
+		return fieldSize;
+	}
+
+	public void setFieldSize(int fieldSize) {
+		this.fieldSize = fieldSize;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public Vector2f getCenter() {
+		return center;
+	}
+
+	public void setCenter(Vector2f center) {
+		this.center = center;
+	}
+
+	public Factory<RenderComponent> getRenderFactory() {
+		return renderFactory;
+	}
+
+	public void setRenderFactory(Factory<RenderComponent> renderFactory) {
+		this.renderFactory = renderFactory;
+	}
+
+	public Factory<MapRenderComponent> getMapRenderFactory() {
+		return mapRenderFactory;
+	}
+
+	public void setMapRenderFactory(Factory<MapRenderComponent> mapRenderFactory) {
+		this.mapRenderFactory = mapRenderFactory;
+	}
+
+	public String getStartMapName() {
+		return startMapName;
+	}
+
+	public void setStartMapName(String startMapName) {
+		this.startMapName = startMapName;
+	}
+
+	public Factory<GameMap> getMapFactory() {
+		return mapFactory;
+	}
+
+	public void setMapFactory(Factory<GameMap> mapFactory) {
+		this.mapFactory = mapFactory;
+	}
+
+	public MapLoader getMapLoader() {
+		return mapLoader;
+	}
+
+	public void setMapLoader(MapLoader mapLoader) {
+		this.mapLoader = mapLoader;
 	}
 
 }
