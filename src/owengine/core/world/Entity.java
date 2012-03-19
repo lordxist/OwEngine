@@ -154,10 +154,18 @@ public class Entity implements ActionUser {
 	}
 
 	public void applyMovement(Direction direction) {
-		if (map.isBlocked(posNextTo(direction))) {
+		if (isBlocked(posNextTo(direction))) {
 			return;
 		}
 		applyAction(new MovementAction(movementDuration, direction));
+	}
+
+	public boolean blocks(Point position) {
+		return this.position.equals(position);
+	}
+
+	protected boolean isBlocked(Point position) {
+		return map.isBlocked(position);
 	}
 
 	public StoryEvent getEvent() {

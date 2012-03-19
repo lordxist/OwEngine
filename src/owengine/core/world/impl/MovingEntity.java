@@ -8,6 +8,10 @@ import owengine.core.world.GameMap;
 import owengine.core.world.StoryEvent;
 import owengine.core.world.impl.controller.SimpleController;
 
+/**
+ * An entity that can be setup to move a certain path.
+ * Adds a controller to its map.
+ */
 public class MovingEntity extends Entity {
 
 	private class MovingController extends SimpleController {

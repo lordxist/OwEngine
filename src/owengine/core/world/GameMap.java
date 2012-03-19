@@ -76,7 +76,7 @@ public class GameMap {
 			return true;
 		}
 		for (Entity e : entities) {
-			if (e.getPosition().equals(position)) {
+			if (e.blocks(position)) {
 				return true;
 			}
 		}

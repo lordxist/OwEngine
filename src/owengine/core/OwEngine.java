@@ -10,16 +10,33 @@ import owengine.core.world.World;
 import owengine.core.world.impl.render.OrthogonalCenteredMapRenderComponent;
 import owengine.core.world.impl.render.OrthogonalCenteredRenderComponent;
 
+/**
+ * Provides a mechanism to load maps/entities with their render components.
+ */
 public class OwEngine {
 
+	/**
+	 * Generic factory to produce objects without passing arguments.
+	 */
 	public interface Factory<T> {
 	
+		/**
+		 * Produces a new instance without passing arguments.
+		 */
 		T createNew();
 	
 	}
 
+	/**
+	 * Simple factory implementation that produces new objects
+	 * for a given class.
+	 */
 	public static class Producer<T> implements Factory<T> {
-			
+		
+		/**
+		 * Thrown when a class used in the producer doesn't have a
+		 * default constructor or is inaccessible.
+		 */
 		public static class IllegalProducerClassException extends RuntimeException {
 
 			/**
@@ -35,6 +52,10 @@ public class OwEngine {
 			this.clazz = clazz;
 		}
 		
+		/*
+		 * (non-Javadoc)
+		 * @see owengine.core.OwEngine.Factory#createNew()
+		 */
 		@Override
 		public T createNew() {
 			try {
@@ -45,7 +66,20 @@ public class OwEngine {
 				throw new IllegalProducerClassException();
 			}
 		}
-	
+		
+		/**
+		 * The class used to produce objects.
+		 */
+		public Class<? extends T> getProducerClass() {
+			return clazz;
+		}
+		
+		/**
+		 * Set the class used to produce objects.
+		 */
+		public void setProducerClass(Class<? extends T> clazz) {
+			this.clazz = clazz;
+		}
 	}
 
 	private int fieldSize;
@@ -64,6 +98,14 @@ public class OwEngine {
 	private Factory<GameMap> mapFactory = new Producer<GameMap>(mapClass);
 	private World world = World.getInstance();
 
+	/**
+	 * Loads maps via the specified map loader. Fits all maps and
+	 * entities with the specified render components.
+	 * Also adds the player (if any) to the start map (if any).
+	 * 
+	 * @throws IllegalProducerClassException when the render or map classes
+	 * have no default constructor or are inaccessible.
+	 */
 	public void loadMaps() {
 		String[] mapNames = mapLoader.getMapNames();
 		for (String mapName : mapNames) {
@@ -75,7 +117,9 @@ public class OwEngine {
 		
 		Entity player = world.getPlayer();
 		GameMap startMap = world.getMapByName(startMapName);
-		startMap.addEntity(player);
+		if (startMap != null && player != null) {
+			startMap.addEntity(player);
+		}
 		
 		for (GameMap map : world.getMaps()) {
 			for (Entity entity : map.getEntities()) {
@@ -108,113 +152,203 @@ public class OwEngine {
 		return renderComponent;
 	}
 
+	/**
+	 * Add the given entity to the given map and set the entity's
+	 * render component.
+	 */
 	public void addEntity(Entity entity, GameMap map) {
 		map.addEntity(entity);
 		entity.setRenderComponent(newRenderComponent());
 	}
 
+	/**
+	 * The class used as default for render components.
+	 */
 	public Class<? extends RenderComponent> getRenderClass() {
 		return renderClass;
 	}
 
+	/**
+	 * Set the default render component class.
+	 * Must have a default constructor and be accessible.
+	 */
 	public void setRenderClass(Class<? extends RenderComponent> renderClass) {
 		this.renderClass = renderClass;
+		if (renderFactory instanceof Producer) {
+			((Producer<RenderComponent>) renderFactory).setProducerClass(renderClass);
+		}
 	}
 
+	/**
+	 * The class used as default for map render components.
+	 */
 	public Class<? extends MapRenderComponent> getMapRenderClass() {
 		return mapRenderClass;
 	}
 
+	/**
+	 * Set the default map render component class.
+	 * Must have a default constructor and be accessible.
+	 */
 	public void setMapRenderClass(Class<? extends MapRenderComponent> mapRenderClass) {
 		this.mapRenderClass = mapRenderClass;
+		if (renderFactory instanceof Producer) {
+			((Producer<MapRenderComponent>) mapRenderFactory).setProducerClass(mapRenderClass);
+		}
 	}
 
+	/**
+	 * The class used as default for maps.
+	 */
 	public Class<? extends GameMap> getMapClass() {
 		return mapClass;
 	}
 
+	/**
+	 * Set the default map class.
+	 * Must have a default constructor and be accessible.
+	 */
 	public void setMapClass(Class<? extends GameMap> mapClass) {
 		this.mapClass = mapClass;
+		if (renderFactory instanceof Producer) {
+			((Producer<GameMap>) mapFactory).setProducerClass(mapClass);
+		}
 	}
 
-	public void setPlayer(Entity player) {
-		world.setPlayer(player);
-	}
-
-	public void setStartMap(String startMapName) {
-		this.startMapName = startMapName;
-	}
-
-	public int getFieldSize() {
-		return fieldSize;
-	}
-
-	public void setFieldSize(int fieldSize) {
-		this.fieldSize = fieldSize;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	public Vector2f getCenter() {
-		return center;
-	}
-
-	public void setCenter(Vector2f center) {
-		this.center = center;
-	}
-
+	/**
+	 * The factory used to produce render components.
+	 */
 	public Factory<RenderComponent> getRenderFactory() {
 		return renderFactory;
 	}
 
+	/**
+	 * Set the factory used to produce render components.
+	 */
 	public void setRenderFactory(Factory<RenderComponent> renderFactory) {
 		this.renderFactory = renderFactory;
 	}
 
+	/**
+	 * The factory used to produce map render components.
+	 */
 	public Factory<MapRenderComponent> getMapRenderFactory() {
 		return mapRenderFactory;
 	}
 
+	/**
+	 * Set the factory used to produce map render components.
+	 */
 	public void setMapRenderFactory(Factory<MapRenderComponent> mapRenderFactory) {
 		this.mapRenderFactory = mapRenderFactory;
 	}
 
-	public String getStartMapName() {
-		return startMapName;
-	}
-
-	public void setStartMapName(String startMapName) {
-		this.startMapName = startMapName;
-	}
-
+	/**
+	 * The factory used to produce maps.
+	 */
 	public Factory<GameMap> getMapFactory() {
 		return mapFactory;
 	}
 
+	/**
+	 * Set the factory used to produce maps.
+	 */
 	public void setMapFactory(Factory<GameMap> mapFactory) {
 		this.mapFactory = mapFactory;
 	}
 
+	/**
+	 * The map loader.
+	 */
 	public MapLoader getMapLoader() {
 		return mapLoader;
 	}
 
+	/**
+	 * Set the map loader.
+	 */
 	public void setMapLoader(MapLoader mapLoader) {
 		this.mapLoader = mapLoader;
+	}
+
+	/**
+	 * Set the player. Identical to
+	 * <p>
+	 * <code>World.getInstance().setPlayer(player)</code>
+	 * </p>
+	 */
+	public void setPlayer(Entity player) {
+		world.setPlayer(player);
+	}
+
+	/**
+	 * The name of the start map.
+	 */
+	public String getStartMapName() {
+		return startMapName;
+	}
+
+	/**
+	 * Set the start map name.
+	 */
+	public void setStartMapName(String startMapName) {
+		this.startMapName = startMapName;
+	}
+
+	/**
+	 * The field size used for the render components.
+	 */
+	public int getFieldSize() {
+		return fieldSize;
+	}
+
+	/**
+	 * Set the field size used for the render components.
+	 */
+	public void setFieldSize(int fieldSize) {
+		this.fieldSize = fieldSize;
+	}
+
+	/**
+	 * The width used for the render components.
+	 */
+	public int getWidth() {
+		return width;
+	}
+
+	/**
+	 * Set the width used for the render components.
+	 */
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	/**
+	 * The height used for the render components.
+	 */
+	public int getHeight() {
+		return height;
+	}
+
+	/**
+	 * Set the height used for the render components.
+	 */
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	/**
+	 * The center used for the render components.
+	 */
+	public Vector2f getCenter() {
+		return center;
+	}
+
+	/**
+	 * Set the center used for the render components.
+	 */
+	public void setCenter(Vector2f center) {
+		this.center = center;
 	}
 
 }
