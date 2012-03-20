@@ -3,24 +3,46 @@ package owengine.core.world.impl;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import owengine.core.util.direction.Direction;
 import owengine.core.world.Entity;
 import owengine.core.world.GameMap;
+import owengine.core.world.MapEvent;
 import owengine.core.world.StoryEvent;
-import owengine.core.world.impl.controller.SimpleController;
 
 /**
- * An entity that can be setup to move a certain path.
- * Adds a controller to its map.
+ * An entity that is setup to move a certain path.
+ * Adds a map event to its map.
  */
 public class MovingEntity extends Entity {
 
-	private class MovingController extends SimpleController {
+	private class MovingEvent extends MapEvent {
 	
-		private ArrayList<Point> path = new ArrayList<Point>();
+		public MovingEvent() {
+			super("moving_"+id);
+			
+			String pathProperty = properties.get("path");
+			if (pathProperty != null) {
+				for (String dir : pathProperty.split(";")) {
+					path.add(Direction.valueOf(dir));
+				}
+			}
+		}
+
+		private ArrayList<Direction> path = new ArrayList<Direction>();
 	
 		@Override
-		public void update(int delta) {
-			applyMovement(direction);
+		public void runRepetitiveEvent() {
+			for (Direction step : path) {
+				while (isActionFinished()) {
+					applyMovement(step);
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				pauseForAction(MovingEntity.this);
+			}
 		}
 	
 	}
@@ -45,7 +67,7 @@ public class MovingEntity extends Entity {
 	@Override
 	public void setMap(GameMap map) {
 		super.setMap(map);
-		map.addController(new MovingController());
+		map.addMapEvent(new MovingEvent());
 	}
 
 }

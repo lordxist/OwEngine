@@ -161,7 +161,11 @@ public class Entity implements ActionUser {
 	}
 
 	public boolean blocks(Point position) {
-		return this.position.equals(position);
+		boolean result = this.position.equals(position);
+		if (!getDeltaPos().equals(new Vector2f(0, 0))) {
+			result |= posNextTo(direction).equals(position);
+		}
+		return result;
 	}
 
 	protected boolean isBlocked(Point position) {

@@ -14,17 +14,19 @@ public class GameMap {
 	private Set<Point> blocked = new HashSet<Point>();
 	private HashMap<Point, StoryEvent> events = new HashMap<Point, StoryEvent>();
 	private StoryEvent event = StoryEvent.NULL_EVENT;
-	private HashSet<Controller> controllers = new HashSet<Controller>();
+	private Set<MapEvent> mapEvents = new HashSet<MapEvent>();
 
 	public void update(int delta) {
-		for (Controller controller : controllers) {
-			controller.update(delta);
-		}
 		for (Entity e : entities) {
 			e.update(delta);
 		}
 		synchronized (event) {
 			event.notify();
+		}
+		for (MapEvent startEvent : mapEvents) {
+			synchronized (startEvent) {
+				startEvent.notify();
+			}
 		}
 		
 		Entity player = World.getInstance().getPlayer();
@@ -43,6 +45,12 @@ public class GameMap {
 		if (event != null) {
 			this.event = event;
 			new Thread(event).start();
+		}
+	}
+
+	public void startMapEvents() {
+		for (MapEvent mapEvent : mapEvents) {
+			new Thread(mapEvent).start();
 		}
 	}
 
@@ -71,6 +79,11 @@ public class GameMap {
 		events.put(pos, event);
 	}
 
+	public void addMapEvent(MapEvent event) {
+		mapEvents.add(event);
+		event.setMap(this);
+	}
+
 	public boolean isBlocked(Point position) {
 		if (blocked.contains(position)) {
 			return true;
@@ -85,26 +98,6 @@ public class GameMap {
 
 	public Set<Entity> getEntities() {
 		return Collections.unmodifiableSet(entities);
-	}
-
-	public void addController(Controller controller) {
-		controllers.add(controller);
-	}
-
-	public void disableControllers() {
-		for (Controller controller : controllers ) {
-			controller.disable();
-		}
-	}
-
-	public void enableControllers() {
-		for (Controller controller : controllers ) {
-			controller.enable();
-		}
-	}
-
-	public Set<Controller> getControllers() {
-		return Collections.unmodifiableSet(controllers);
 	}
 
 }

@@ -42,6 +42,10 @@ public class World {
 		player.getMap().update(delta);
 	}
 
+	public void startMapEvents() {
+		player.getMap().startMapEvents();
+	}
+
 	public void addMapWithName(String mapName, GameMap map) {
 		maps.put(mapName, map);
 	}
@@ -62,14 +66,12 @@ public class World {
 		for (Controller controller : controllers) {
 			controller.disable();
 		}
-		player.getMap().disableControllers();
 	}
 
 	public void enableControllers() {
 		for (Controller controller : controllers) {
 			controller.enable();
 		}
-		player.getMap().enableControllers();
 	}
 
 	public Set<Controller> getControllers() {

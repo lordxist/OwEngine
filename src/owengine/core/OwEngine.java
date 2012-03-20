@@ -1,5 +1,10 @@
 package owengine.core;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+
 import javax.vecmath.Vector2f;
 
 import owengine.core.world.Entity;
@@ -106,7 +111,7 @@ public class OwEngine {
 	 * @throws IllegalProducerClassException when the render or map classes
 	 * have no default constructor or are inaccessible.
 	 */
-	public void loadMaps() {
+	public void loadMaps() {		
 		String[] mapNames = mapLoader.getMapNames();
 		for (String mapName : mapNames) {
 			GameMap map = mapFactory.createNew();
@@ -159,6 +164,54 @@ public class OwEngine {
 	public void addEntity(Entity entity, GameMap map) {
 		map.addEntity(entity);
 		entity.setRenderComponent(newRenderComponent());
+	}
+
+	/**
+	 * Load the properties from the given file.
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 * @throws ClassNotFoundException 
+	 */
+	@SuppressWarnings("unchecked")
+	public void loadProperties(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
+		Properties properties = new Properties();
+		properties.load(new FileInputStream(filename));
+		String property, property2;
+		if ((property = properties.getProperty("renderClass")) != null) {
+			renderClass = (Class<? extends RenderComponent>) Class.forName(property);
+		}
+		if ((property = properties.getProperty("mapRenderClass")) != null) {
+			mapRenderClass = (Class<? extends MapRenderComponent>) Class.forName(property);
+		}
+		if ((property = properties.getProperty("mapClass")) != null) {
+			mapClass = (Class<? extends GameMap>) Class.forName(property);
+		}
+		if ((property = properties.getProperty("width")) != null) {
+			width = Integer.parseInt(property);
+		}
+		if ((property = properties.getProperty("height")) != null) {
+			height = Integer.parseInt(property);
+		}
+		if ((property = properties.getProperty("fieldSize")) != null) {
+			fieldSize = Integer.parseInt(property);
+		}
+		if ((property = properties.getProperty("centerX")) != null &&
+				(property2 = properties.getProperty("centerY")) != null) {
+			center = new Vector2f(Integer.parseInt(property), Integer.parseInt(property2));
+		}
+		if ((property = properties.getProperty("startMapName")) != null) {
+			startMapName = property;
+		}
+	}
+
+	/**
+	 * Load the properties using the default filename.
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 * @throws ClassNotFoundException 
+	 */
+	public void loadProperties() throws FileNotFoundException, IOException, ClassNotFoundException {
+		loadProperties("../owengine.properties");
 	}
 
 	/**
@@ -304,6 +357,9 @@ public class OwEngine {
 
 	/**
 	 * Set the field size used for the render components.
+	 * Will only be used when the render components are
+	 * subclasses of OrthogonalCenteredMapRenderComponent
+	 * or OrthogonalCenteredRenderComponent, respectively.
 	 */
 	public void setFieldSize(int fieldSize) {
 		this.fieldSize = fieldSize;
@@ -318,6 +374,9 @@ public class OwEngine {
 
 	/**
 	 * Set the width used for the render components.
+	 * Will only be used when the render components are
+	 * subclasses of OrthogonalCenteredMapRenderComponent
+	 * or OrthogonalCenteredRenderComponent, respectively.
 	 */
 	public void setWidth(int width) {
 		this.width = width;
@@ -332,6 +391,9 @@ public class OwEngine {
 
 	/**
 	 * Set the height used for the render components.
+	 * Will only be used when the render components are
+	 * subclasses of OrthogonalCenteredMapRenderComponent
+	 * or OrthogonalCenteredRenderComponent, respectively.
 	 */
 	public void setHeight(int height) {
 		this.height = height;
@@ -346,6 +408,9 @@ public class OwEngine {
 
 	/**
 	 * Set the center used for the render components.
+	 * Will only be used when the render components are
+	 * subclasses of OrthogonalCenteredMapRenderComponent
+	 * or OrthogonalCenteredRenderComponent, respectively.
 	 */
 	public void setCenter(Vector2f center) {
 		this.center = center;
