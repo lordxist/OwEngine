@@ -1,4 +1,4 @@
-package owengine.ext.tiled;
+package owengine.ext.tiled.world;
 
 import owengine.core.world.GameMap;
 import tiled.core.Map;

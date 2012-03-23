@@ -31,6 +31,11 @@ public abstract class StoryEvent implements Runnable {
 
 	private String name;
 	private boolean finished;
+	private GameMap map;
+
+	void setMap(GameMap map) {
+		this.map = map;
+	}
 
 	@Override
 	public synchronized void run() {
@@ -52,6 +57,10 @@ public abstract class StoryEvent implements Runnable {
 
 	public boolean isFinished() {
 		return finished;
+	}
+
+	public GameMap getMap() {
+		return map;
 	}
 
 	protected void pauseForAction(ActionUser actionUser) {

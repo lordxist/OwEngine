@@ -34,7 +34,7 @@ public class Entity implements ActionUser {
 
 	public static final int STD_MOVEMENT_DURATION = 300;
 
-	protected RenderComponent renderComponent;
+	protected Renderer renderComponent;
 	protected int id;
 	protected String type;
 	protected Point position;
@@ -47,8 +47,12 @@ public class Entity implements ActionUser {
 	protected String message;
 	protected HashMap<String, String> properties = new HashMap<String, String>();
 
-	public Entity(int id, String type, Point position) {
+	public Entity(int id) {
 		this.id = id;
+	}
+
+	public Entity(int id, String type, Point position) {
+		this(id);
 		this.type = type;
 		this.position = position;
 		entities.put(id, this);
@@ -78,17 +82,25 @@ public class Entity implements ActionUser {
 		renderComponent.paint(g);
 	}
 
-	public RenderComponent getRenderComponent() {
+	public Renderer getRenderComponent() {
 		return renderComponent;
 	}
 
-	public void setRenderComponent(RenderComponent renderComponent) {
+	public void setRenderComponent(Renderer renderComponent) {
 		this.renderComponent = renderComponent;
 		renderComponent.setEntity(this);
 	}
 
+	public int getId() {
+		return id;
+	}
+
 	public String getType() {
 		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public Point getPosition() {
@@ -157,6 +169,10 @@ public class Entity implements ActionUser {
 		if (isBlocked(posNextTo(direction))) {
 			return;
 		}
+		Entity touched = map.getEntity(posNextTo(direction));
+		if (touched != null) {
+			touched.touch();
+		}
 		applyAction(new MovementAction(movementDuration, direction));
 	}
 
@@ -208,6 +224,8 @@ public class Entity implements ActionUser {
 	public void explore() {
 		new Thread(event).start();
 	}
+
+	public void touch() {}
 
 	@Override
 	public String toString() {

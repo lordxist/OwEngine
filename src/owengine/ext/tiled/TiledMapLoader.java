@@ -4,7 +4,10 @@ import java.io.File;
 
 import owengine.core.MapLoader;
 import owengine.core.world.GameMap;
+import owengine.ext.tiled.world.TiledGameMap;
 import tiled.core.Map;
+import tiled.core.MapLayer;
+import tiled.core.TileLayer;
 import tiled.io.TMXMapReader;
 
 public class TiledMapLoader extends MapLoader {
@@ -15,6 +18,16 @@ public class TiledMapLoader extends MapLoader {
 			TMXMapReader reader = new TMXMapReader();
 			Map tiledMap = reader.readMap("../res/maps/"+mapName+".tmx");
 			((TiledGameMap) map).setTiledMap(tiledMap);
+			for (MapLayer layer : tiledMap.getLayers()) {
+				if (layer instanceof TileLayer) {
+					TileLayer tileLayer = (TileLayer) layer;
+					for (int x = 0; x < tileLayer.getWidth(); x++) {
+						for (int y = 0; y < tileLayer.getHeight(); y++) {
+							tileLayer.getTileAt(x, y).getImage();
+						}
+					} 
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

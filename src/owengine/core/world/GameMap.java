@@ -2,19 +2,41 @@ package owengine.core.world;
 
 import java.awt.Graphics;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class GameMap {
 
-	private MapRenderComponent renderComponent;
+	public static class Layer {
+	
+		private HashMap<Point, String> tileTypes = new HashMap<Point, String>();
+		private String name;
+		
+		public String getName() {
+			return name;
+		}
+	
+		public String getTileType(Point pos) {
+			return tileTypes.get(pos);
+		}
+	
+		public void setTileType(Point pos, String type) {
+			tileTypes.put(pos, type);
+		}
+	
+	}
+
+	private MapRenderer renderComponent;
 	private Set<Entity> entities = new HashSet<Entity>();
 	private Set<Point> blocked = new HashSet<Point>();
+	private List<Layer> layers = new ArrayList<Layer>();
 	private HashMap<Point, StoryEvent> events = new HashMap<Point, StoryEvent>();
 	private StoryEvent event = StoryEvent.NULL_EVENT;
-	private Set<MapEvent> mapEvents = new HashSet<MapEvent>();
+	private Set<StoryEvent> mapEvents = new HashSet<StoryEvent>();
 
 	public void update(int delta) {
 		for (Entity e : entities) {
@@ -23,7 +45,7 @@ public class GameMap {
 		synchronized (event) {
 			event.notify();
 		}
-		for (MapEvent startEvent : mapEvents) {
+		for (StoryEvent startEvent : mapEvents) {
 			synchronized (startEvent) {
 				startEvent.notify();
 			}
@@ -49,7 +71,7 @@ public class GameMap {
 	}
 
 	public void startMapEvents() {
-		for (MapEvent mapEvent : mapEvents) {
+		for (StoryEvent mapEvent : mapEvents) {
 			new Thread(mapEvent).start();
 		}
 	}
@@ -61,7 +83,7 @@ public class GameMap {
 		}
 	}
 
-	public void setRenderComponent(MapRenderComponent renderComponent) {
+	public void setRenderComponent(MapRenderer renderComponent) {
 		this.renderComponent = renderComponent;
 		renderComponent.setMap(this);
 	}
@@ -71,15 +93,45 @@ public class GameMap {
 		entities.add(e);
 	}
 
+	public Entity getEntity(Point pos) {
+		for (Entity entity : entities) {
+			if (entity.getPosition().equals(pos)) {
+				return entity;
+			}
+		}
+		return null;
+	}
+
 	public void block(Point point) {
 		blocked.add(point);
+	}
+
+	public void addLayer(Layer layer) {
+		layers.add(layer);
+	}
+
+	public Layer getLayerByZOrder(int zOrder) {
+		return layers.get(zOrder);
+	}
+
+	public Layer getLayerByName(String name) {
+		for (Layer layer : layers) {
+			if (layer.getName().equals(name)) {
+				return layer;
+			}
+		}
+		return null;
+	}
+
+	public List<Layer> getLayers() {
+		return Collections.unmodifiableList(layers);
 	}
 
 	public void addEvent(Point pos, StoryEvent event) {
 		events.put(pos, event);
 	}
 
-	public void addMapEvent(MapEvent event) {
+	public void addMapEvent(StoryEvent event) {
 		mapEvents.add(event);
 		event.setMap(this);
 	}

@@ -9,11 +9,9 @@ import javax.vecmath.Vector2f;
 
 import owengine.core.world.Entity;
 import owengine.core.world.GameMap;
-import owengine.core.world.MapRenderComponent;
-import owengine.core.world.RenderComponent;
+import owengine.core.world.MapRenderer;
+import owengine.core.world.Renderer;
 import owengine.core.world.World;
-import owengine.core.world.impl.render.OrthogonalCenteredMapRenderComponent;
-import owengine.core.world.impl.render.OrthogonalCenteredRenderComponent;
 
 /**
  * Provides a mechanism to load maps/entities with their render components.
@@ -87,19 +85,21 @@ public class OwEngine {
 		}
 	}
 
-	private int fieldSize;
+	public static final int DEFAULT_FIELD_SIZE = 16;
+
+	private int fieldSize = DEFAULT_FIELD_SIZE;
 	private int width;
 	private int height;
 	private Vector2f center;
 	private String startMapName;
 	private MapLoader mapLoader;
-	private Class<? extends RenderComponent> renderClass;
-	private Class<? extends MapRenderComponent> mapRenderClass;
+	private Class<? extends Renderer> renderClass;
+	private Class<? extends MapRenderer> mapRenderClass;
 	private Class<? extends GameMap> mapClass = GameMap.class;
-	private Factory<RenderComponent> renderFactory =
-		new Producer<RenderComponent>(renderClass);
-	private Factory<MapRenderComponent> mapRenderFactory =
-		new Producer<MapRenderComponent>(mapRenderClass);
+	private Factory<Renderer> renderFactory =
+		new Producer<Renderer>(renderClass);
+	private Factory<MapRenderer> mapRenderFactory =
+		new Producer<MapRenderer>(mapRenderClass);
 	private Factory<GameMap> mapFactory = new Producer<GameMap>(mapClass);
 	private World world = World.getInstance();
 
@@ -133,28 +133,30 @@ public class OwEngine {
 		}
 	}
 
-	private RenderComponent newRenderComponent() {
-		RenderComponent renderComponent = renderFactory.createNew();
-		if (renderComponent instanceof OrthogonalCenteredRenderComponent) {
-			OrthogonalCenteredRenderComponent ocRenderComponent =
-				(OrthogonalCenteredRenderComponent) renderComponent;
-			ocRenderComponent.setCenter(center);
-			ocRenderComponent.setFieldSize(fieldSize);
-			ocRenderComponent.setCenterEntity(world.getPlayer());
+	private Renderer newRenderComponent() {
+		Renderer renderer = renderFactory.createNew();
+		renderer.getHelper().setFieldSize(fieldSize);
+		if (renderer instanceof Renderer.CenteredRenderer) {
+			Renderer.CenteredRenderer centeredRenderer =
+				(Renderer.CenteredRenderer) renderer;
+			centeredRenderer.setCenter(getCenter());
+			centeredRenderer.setCenterEntity(world.getPlayer());
 		}
-		return renderComponent;
+		return renderer;
 	}
 
-	private MapRenderComponent newMapRenderComponent() {
-		MapRenderComponent renderComponent = mapRenderFactory.createNew();
-		if (renderComponent instanceof OrthogonalCenteredMapRenderComponent) {
-			OrthogonalCenteredMapRenderComponent ocRenderComponent =
-				(OrthogonalCenteredMapRenderComponent) renderComponent;
-			ocRenderComponent.setFieldSize(fieldSize);
-			ocRenderComponent.setHeight(height);
-			ocRenderComponent.setWidth(width);
+	private MapRenderer newMapRenderComponent() {
+		MapRenderer renderer = mapRenderFactory.createNew();
+		renderer.setFieldSize(fieldSize);
+		renderer.setHeight(height);
+		renderer.setWidth(width);
+		if (renderer instanceof MapRenderer.CenteredRenderer) {
+			MapRenderer.CenteredRenderer centeredRenderer =
+				(MapRenderer.CenteredRenderer) renderer;
+			centeredRenderer.setCenter(getCenter());
+			centeredRenderer.setCenterEntity(world.getPlayer());
 		}
-		return renderComponent;
+		return renderer;
 	}
 
 	/**
@@ -177,14 +179,17 @@ public class OwEngine {
 		Properties properties = new Properties();
 		properties.load(new FileInputStream(filename));
 		String property, property2;
+		if ((property = properties.getProperty("modelPackage")) != null) {
+			setModelPackage(Package.getPackage(property));
+		}
 		if ((property = properties.getProperty("renderClass")) != null) {
-			renderClass = (Class<? extends RenderComponent>) Class.forName(property);
+			setRenderClass((Class<? extends Renderer>) Class.forName(property));
 		}
 		if ((property = properties.getProperty("mapRenderClass")) != null) {
-			mapRenderClass = (Class<? extends MapRenderComponent>) Class.forName(property);
+			setMapRenderClass((Class<? extends MapRenderer>) Class.forName(property));
 		}
 		if ((property = properties.getProperty("mapClass")) != null) {
-			mapClass = (Class<? extends GameMap>) Class.forName(property);
+			setMapClass((Class<? extends GameMap>) Class.forName(property));
 		}
 		if ((property = properties.getProperty("width")) != null) {
 			width = Integer.parseInt(property);
@@ -215,9 +220,23 @@ public class OwEngine {
 	}
 
 	/**
+	 * The package from which models are to be loaded.
+	 */
+	public Package getModelPackage() {
+		return mapLoader.getModelPackage();
+	}
+
+	/**
+	 * Set the model package
+	 */
+	public void setModelPackage(Package modelPackage) {
+		mapLoader.setModelPackage(modelPackage);
+	}
+
+	/**
 	 * The class used as default for render components.
 	 */
-	public Class<? extends RenderComponent> getRenderClass() {
+	public Class<? extends Renderer> getRenderClass() {
 		return renderClass;
 	}
 
@@ -225,17 +244,15 @@ public class OwEngine {
 	 * Set the default render component class.
 	 * Must have a default constructor and be accessible.
 	 */
-	public void setRenderClass(Class<? extends RenderComponent> renderClass) {
+	public void setRenderClass(Class<? extends Renderer> renderClass) {
 		this.renderClass = renderClass;
-		if (renderFactory instanceof Producer) {
-			((Producer<RenderComponent>) renderFactory).setProducerClass(renderClass);
-		}
+		renderFactory = new Producer<Renderer>(renderClass);
 	}
 
 	/**
 	 * The class used as default for map render components.
 	 */
-	public Class<? extends MapRenderComponent> getMapRenderClass() {
+	public Class<? extends MapRenderer> getMapRenderClass() {
 		return mapRenderClass;
 	}
 
@@ -243,11 +260,9 @@ public class OwEngine {
 	 * Set the default map render component class.
 	 * Must have a default constructor and be accessible.
 	 */
-	public void setMapRenderClass(Class<? extends MapRenderComponent> mapRenderClass) {
+	public void setMapRenderClass(Class<? extends MapRenderer> mapRenderClass) {
 		this.mapRenderClass = mapRenderClass;
-		if (renderFactory instanceof Producer) {
-			((Producer<MapRenderComponent>) mapRenderFactory).setProducerClass(mapRenderClass);
-		}
+		mapRenderFactory = new Producer<MapRenderer>(mapRenderClass);
 	}
 
 	/**
@@ -263,36 +278,34 @@ public class OwEngine {
 	 */
 	public void setMapClass(Class<? extends GameMap> mapClass) {
 		this.mapClass = mapClass;
-		if (renderFactory instanceof Producer) {
-			((Producer<GameMap>) mapFactory).setProducerClass(mapClass);
-		}
+		mapFactory = new Producer<GameMap>(mapClass);
 	}
 
 	/**
 	 * The factory used to produce render components.
 	 */
-	public Factory<RenderComponent> getRenderFactory() {
+	public Factory<Renderer> getRenderFactory() {
 		return renderFactory;
 	}
 
 	/**
 	 * Set the factory used to produce render components.
 	 */
-	public void setRenderFactory(Factory<RenderComponent> renderFactory) {
+	public void setRenderFactory(Factory<Renderer> renderFactory) {
 		this.renderFactory = renderFactory;
 	}
 
 	/**
 	 * The factory used to produce map render components.
 	 */
-	public Factory<MapRenderComponent> getMapRenderFactory() {
+	public Factory<MapRenderer> getMapRenderFactory() {
 		return mapRenderFactory;
 	}
 
 	/**
 	 * Set the factory used to produce map render components.
 	 */
-	public void setMapRenderFactory(Factory<MapRenderComponent> mapRenderFactory) {
+	public void setMapRenderFactory(Factory<MapRenderer> mapRenderFactory) {
 		this.mapRenderFactory = mapRenderFactory;
 	}
 
@@ -322,16 +335,6 @@ public class OwEngine {
 	 */
 	public void setMapLoader(MapLoader mapLoader) {
 		this.mapLoader = mapLoader;
-	}
-
-	/**
-	 * Set the player. Identical to
-	 * <p>
-	 * <code>World.getInstance().setPlayer(player)</code>
-	 * </p>
-	 */
-	public void setPlayer(Entity player) {
-		world.setPlayer(player);
 	}
 
 	/**
@@ -401,8 +404,13 @@ public class OwEngine {
 
 	/**
 	 * The center used for the render components.
+	 * Default coordinates are: (size/fieldSize)/2,
+	 * where size is width or height, respectively.
 	 */
 	public Vector2f getCenter() {
+		if (center == null) {
+			return new Vector2f((width/fieldSize)/2, (height/fieldSize)/2);
+		}
 		return center;
 	}
 
