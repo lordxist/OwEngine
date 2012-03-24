@@ -1,5 +1,6 @@
 package owengine.ext.tiled;
 
+import java.awt.Point;
 import java.io.File;
 
 import owengine.core.MapLoader;
@@ -19,11 +20,13 @@ public class TiledMapLoader extends MapLoader {
 			Map tiledMap = reader.readMap("../res/maps/"+mapName+".tmx");
 			((TiledGameMap) map).setTiledMap(tiledMap);
 			for (MapLayer layer : tiledMap.getLayers()) {
-				if (layer instanceof TileLayer) {
+				if (layer.getName().equals("blocked")) {
 					TileLayer tileLayer = (TileLayer) layer;
 					for (int x = 0; x < tileLayer.getWidth(); x++) {
 						for (int y = 0; y < tileLayer.getHeight(); y++) {
-							tileLayer.getTileAt(x, y).getImage();
+							if (tileLayer.getTileAt(x, y) != null) {
+								map.block(new Point(x, y));
+							}
 						}
 					} 
 				}
