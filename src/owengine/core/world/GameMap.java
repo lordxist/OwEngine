@@ -56,9 +56,6 @@ public class GameMap {
 
 	public void paint(Graphics g) {
 		renderComponent.paint(g);
-		for (Entity e : entities) {
-			e.paint(g);
-		}
 	}
 
 	public void setRenderComponent(MapRenderer renderComponent) {

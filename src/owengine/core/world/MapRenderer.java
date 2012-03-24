@@ -44,7 +44,15 @@ public abstract class MapRenderer {
 		this.map = map;
 	}
 
-	public abstract void paint(Graphics g);
+	public void paint(Graphics g) {
+		paintEntities(g);
+	}
+
+	public void paintEntities(Graphics g) {
+		for (Entity e : map.getEntities()) {
+			e.paint(g);
+		}
+	}
 
 	public void setFieldSize(int fieldSize) {
 		this.fieldSize = fieldSize;

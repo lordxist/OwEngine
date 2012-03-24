@@ -7,6 +7,7 @@ import owengine.core.world.MapRenderer;
 import owengine.ext.tiled.world.TiledGameMap;
 import tiled.core.Map;
 import tiled.core.MapLayer;
+import tiled.core.ObjectGroup;
 import tiled.core.TileLayer;
 
 public class SimpleTiledMapRenderer extends MapRenderer {
@@ -16,12 +17,19 @@ public class SimpleTiledMapRenderer extends MapRenderer {
 		Map tiledMap = tiledGameMap.getTiledMap();
 			
 		tiled.view.MapRenderer tiledRenderer = new tiled.view.OrthogonalRenderer(tiledMap);
-		g = g.create(renderer.getX(), renderer.getY(), renderer.getWidth(), renderer.getHeight());
+		Graphics2D g2 = (Graphics2D) g.create(
+			renderer.getX(),
+			renderer.getY(),
+			renderer.getWidth(),
+			renderer.getHeight()
+		);
 		for (MapLayer layer : tiledMap.getLayers()) {
 			if (layer instanceof TileLayer &&
 					!(layer.getProperties().containsKey("render") &&
 						layer.getProperties().get("render").equals("false"))) {
-				tiledRenderer.paintTileLayer((Graphics2D) g, (TileLayer) layer);
+				tiledRenderer.paintTileLayer(g2, (TileLayer) layer);
+			} else if (layer instanceof ObjectGroup) {
+				renderer.paintEntities(g);
 			}
 		}
 	}
