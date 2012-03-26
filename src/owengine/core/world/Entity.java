@@ -171,7 +171,7 @@ public class Entity implements ActionUser {
 		}
 		Entity touched = map.getEntity(posNextTo(direction));
 		if (touched != null) {
-			touched.touch();
+			touched.touch(this);
 		}
 		applyAction(new MovementAction(movementDuration, direction));
 	}
@@ -225,7 +225,7 @@ public class Entity implements ActionUser {
 		new Thread(event).start();
 	}
 
-	public void touch() {}
+	public void touch(Entity toucher) {}
 
 	@Override
 	public String toString() {
