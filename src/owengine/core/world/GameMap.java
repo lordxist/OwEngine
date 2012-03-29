@@ -17,11 +17,13 @@ public class GameMap {
 	private StoryEvent event = StoryEvent.NULL_EVENT;
 	private Set<StoryEvent> mapEvents = new HashSet<StoryEvent>();
 	private HashMap<Point, TimedAction> posActions = new HashMap<Point, TimedAction>();
+	private HashMap<Point, Warp> warps = new HashMap<Point, Warp>();
 
 	public void update(int delta) {
 		for (Entity e : entities) {
 			e.update(delta);
 		}
+		
 		synchronized (event) {
 			event.notify();
 		}
@@ -41,6 +43,11 @@ public class GameMap {
 	private void playerUpdate(Entity player) {
 		if (!event.isFinished()) {
 			return;
+		}
+		
+		Warp warp = warps.get(player.getPosition());
+		if (warp != null) {
+			warp.warp(player);
 		}
 		
 		StoryEvent event = events.get(player.getPosition());
