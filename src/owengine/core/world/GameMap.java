@@ -122,4 +122,18 @@ public class GameMap {
 		posActions.get(pos).start();
 	}
 
+	/**
+	 * Convenience method to retrieve a specific tile's id.
+	 * Implemented only in subclasses in extensions.
+	 */
+	public int getTileId(String layer, Point pos) {
+		return -1;
+	}
+
+	/**
+	 * Convenience method to manipulate a specific tile.
+	 * Implemented only in subclasses in extensions.
+	 */
+	public void setTileId(String layer, Point pos, int id) {}
+
 }

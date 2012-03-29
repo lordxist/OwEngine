@@ -30,4 +30,23 @@ public class TiledGameMap extends GameMap {
 		return super.isBlocked(position);
 	}
 
+	@Override
+	public int getTileId(String layer, Point pos) {
+		return getTileLayer(layer).getTileAt(pos.x, pos.y).getId();
+	}
+
+	@Override
+	public void setTileId(String layer, Point pos, int id) {
+		getTileLayer(layer).getTileAt(pos.x, pos.y).setId(id);
+	}
+
+	public TileLayer getTileLayer(String name) {
+		for (MapLayer layer : tiledMap.getLayers()) {
+			if (layer instanceof TileLayer && layer.getName().equals(name)) {
+				return (TileLayer) layer;
+			}
+		}
+		return null;
+	}
+
 }
