@@ -1,17 +1,19 @@
 package owengine.ext.tiled;
 
-import java.awt.Point;
 import java.io.File;
+import java.util.Iterator;
 
 import owengine.core.MapLoader;
+import owengine.core.world.Entity;
 import owengine.core.world.GameMap;
 import owengine.ext.tiled.world.TiledGameMap;
 import tiled.core.Map;
 import tiled.core.MapLayer;
-import tiled.core.TileLayer;
+import tiled.core.MapObject;
+import tiled.core.ObjectGroup;
 import tiled.io.TMXMapReader;
 
-public class TiledMapLoader extends MapLoader {
+public class TiledMapLoader implements MapLoader {
 
 	@Override
 	public void load(String mapName, GameMap map) {
@@ -20,20 +22,26 @@ public class TiledMapLoader extends MapLoader {
 			Map tiledMap = reader.readMap("../res/maps/"+mapName+".tmx");
 			((TiledGameMap) map).setTiledMap(tiledMap);
 			for (MapLayer layer : tiledMap.getLayers()) {
-				if (layer.getName().equals("blocked")) {
-					TileLayer tileLayer = (TileLayer) layer;
-					for (int x = 0; x < tileLayer.getWidth(); x++) {
-						for (int y = 0; y < tileLayer.getHeight(); y++) {
-							if (tileLayer.getTileAt(x, y) != null) {
-								map.block(new Point(x, y));
-							}
+				if (layer instanceof ObjectGroup) {
+					final ObjectGroup objectGroup = (ObjectGroup) layer;
+					for (MapObject object : new Iterable<MapObject>() {
+						@Override
+						public Iterator<MapObject> iterator() {
+							return objectGroup.getObjects();
 						}
-					} 
+					}) {
+						map.addEntity(loadEntity(object));
+					}
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	protected Entity loadEntity(MapObject object) {
+		return new Entity(
+				Integer.parseInt(object.getProperties().getProperty("id", "-1")));
 	}
 
 	@Override

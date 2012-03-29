@@ -179,9 +179,6 @@ public class OwEngine {
 		Properties properties = new Properties();
 		properties.load(new FileInputStream(filename));
 		String property, property2;
-		if ((property = properties.getProperty("modelPackage")) != null) {
-			setModelPackage(Package.getPackage(property));
-		}
 		if ((property = properties.getProperty("renderClass")) != null) {
 			setRenderClass((Class<? extends Renderer>) Class.forName(property));
 		}
@@ -217,20 +214,6 @@ public class OwEngine {
 	 */
 	public void loadProperties() throws FileNotFoundException, IOException, ClassNotFoundException {
 		loadProperties("../owengine.properties");
-	}
-
-	/**
-	 * The package from which models are to be loaded.
-	 */
-	public Package getModelPackage() {
-		return mapLoader.getModelPackage();
-	}
-
-	/**
-	 * Set the model package
-	 */
-	public void setModelPackage(Package modelPackage) {
-		mapLoader.setModelPackage(modelPackage);
 	}
 
 	/**

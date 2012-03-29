@@ -8,14 +8,19 @@ public abstract class TimedAction {
 	protected int time;
 	protected int duration;
 	protected boolean finished;
+	private boolean started;
 
 	public TimedAction(String name, int duration) {
 		this.name = name;
 		this.duration = duration;
 	}
 
+	public void start() {
+		started = true;
+	}
+
 	public void update(int delta) {
-		if (finished) {
+		if ((!started) || finished) {
 			return;
 		}
 		time += delta;

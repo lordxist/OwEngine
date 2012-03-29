@@ -1,4 +1,4 @@
-package owengine.core.util.direction;
+package owengine.core.world;
 
 import java.awt.Point;
 

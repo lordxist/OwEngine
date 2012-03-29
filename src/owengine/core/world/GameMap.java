@@ -7,14 +7,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import owengine.core.util.timed.TimedAction;
+
 public class GameMap {
 
 	private MapRenderer renderComponent;
 	private Set<Entity> entities = new HashSet<Entity>();
-	private Set<Point> blocked = new HashSet<Point>();
 	private HashMap<Point, StoryEvent> events = new HashMap<Point, StoryEvent>();
 	private StoryEvent event = StoryEvent.NULL_EVENT;
 	private Set<StoryEvent> mapEvents = new HashSet<StoryEvent>();
+	private HashMap<Point, TimedAction> posActions = new HashMap<Point, TimedAction>();
 
 	public void update(int delta) {
 		for (Entity e : entities) {
@@ -77,10 +79,6 @@ public class GameMap {
 		return null;
 	}
 
-	public void block(Point point) {
-		blocked.add(point);
-	}
-
 	public void addEvent(Point pos, StoryEvent event) {
 		events.put(pos, event);
 	}
@@ -91,9 +89,6 @@ public class GameMap {
 	}
 
 	public boolean isBlocked(Point position) {
-		if (blocked.contains(position)) {
-			return true;
-		}
 		for (Entity e : entities) {
 			if (e.blocks(position)) {
 				return true;
@@ -104,6 +99,20 @@ public class GameMap {
 
 	public Set<Entity> getEntities() {
 		return Collections.unmodifiableSet(entities);
+	}
+
+	public void addPosAction(Point pos, TimedAction action) {
+		posActions.put(pos, action);
+	}
+
+	public void addPosAction(Point pos, String name, int duration) {
+		addPosAction(pos, new TimedAction(name, duration) {
+			@Override public void updateAction(float delta) {}
+		});
+	}
+
+	public void touchPos(Point pos) {
+		posActions.get(pos).start();
 	}
 
 }

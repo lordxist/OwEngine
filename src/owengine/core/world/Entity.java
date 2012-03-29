@@ -6,17 +6,21 @@ import java.util.HashMap;
 
 import javax.vecmath.Vector2f;
 
-import owengine.core.util.direction.Direction;
 import owengine.core.util.timed.ActionUser;
 import owengine.core.util.timed.TimedAction;
 
 public class Entity implements ActionUser {
 
-	public static abstract class EntityStoryEvent extends StoryEvent {
+	public static abstract class EntityEvent extends StoryEvent {
 
+		public static final EntityEvent NULL_ENTITY_EVENT = new EntityEvent(null) {
+			@Override
+			public void runEvent() {}
+		};
+		
 		protected Entity entity;
 
-		public EntityStoryEvent(String name) {
+		public EntityEvent(String name) {
 			super(name);
 		}
 	
@@ -35,15 +39,18 @@ public class Entity implements ActionUser {
 	public static final int STD_MOVEMENT_DURATION = 300;
 
 	protected Renderer renderComponent;
+	protected EntityController controller = EntityController.NULL_CONTROLLER;
 	protected int id;
 	protected String type;
 	protected Point position;
 	protected Vector2f deltaPos = new Vector2f(0, 0);
 	protected Direction direction = Direction.south;
 	protected GameMap map;
+	protected boolean blocking = true;
 	protected TimedAction action = TimedAction.NULL_ACTION;
 	protected int movementDuration = STD_MOVEMENT_DURATION;
-	protected StoryEvent event = StoryEvent.NULL_EVENT;
+	protected EntityEvent event = EntityEvent.NULL_ENTITY_EVENT;
+	protected EntityEvent touchEvent = EntityEvent.NULL_ENTITY_EVENT;
 	protected String message;
 	protected HashMap<String, String> properties = new HashMap<String, String>();
 
@@ -58,7 +65,7 @@ public class Entity implements ActionUser {
 		entities.put(id, this);
 	}
 
-	public Entity(int id, String type, Point position, StoryEvent event) {
+	public Entity(int id, String type, Point position, EntityEvent event) {
 		this(id, type, position);
 		this.event = event;
 	}
@@ -68,7 +75,7 @@ public class Entity implements ActionUser {
 		this.message = message;
 	}
 
-	public Entity(int id, String type, Point position, StoryEvent event, 
+	public Entity(int id, String type, Point position, EntityEvent event, 
 			String message) {
 		this(id, type, position, event);
 		this.message = message;
@@ -76,6 +83,7 @@ public class Entity implements ActionUser {
 
 	public void update(int delta) {
 		action.update(delta);
+		controller.update(delta);
 	}
 
 	public void paint(Graphics g) {
@@ -89,6 +97,15 @@ public class Entity implements ActionUser {
 	public void setRenderComponent(Renderer renderComponent) {
 		this.renderComponent = renderComponent;
 		renderComponent.setEntity(this);
+	}
+
+	public EntityController getController() {
+		return controller;
+	}
+
+	public void setController(EntityController controller) {
+		this.controller = controller;
+		controller.setEntity(this);
 	}
 
 	public int getId() {
@@ -152,8 +169,15 @@ public class Entity implements ActionUser {
 	public void applyAction(EntityAction action) {
 		if (isActionFinished()) {
 			action.setEntity(this);
+			action.start();
 			this.action = action;
 		}
+	}
+
+	public void applyAction(String name, int duration) {
+		applyAction(new EntityAction(name, duration) {
+			@Override public void updateAction(float delta) {}
+		});
 	}
 
 	public TimedAction getAction() {
@@ -166,7 +190,7 @@ public class Entity implements ActionUser {
 	}
 
 	public void applyMovement(Direction direction) {
-		if (isBlocked(posNextTo(direction))) {
+		if (map.isBlocked(posNextTo(direction))) {
 			return;
 		}
 		Entity touched = map.getEntity(posNextTo(direction));
@@ -177,6 +201,9 @@ public class Entity implements ActionUser {
 	}
 
 	public boolean blocks(Point position) {
+		if (!blocking) {
+			return false;
+		}
 		boolean result = this.position.equals(position);
 		if (!getDeltaPos().equals(new Vector2f(0, 0))) {
 			result |= posNextTo(direction).equals(position);
@@ -184,17 +211,30 @@ public class Entity implements ActionUser {
 		return result;
 	}
 
-	protected boolean isBlocked(Point position) {
-		return map.isBlocked(position);
+	public boolean isBlocking() {
+		return blocking;
 	}
 
-	public StoryEvent getEvent() {
+	public void setBlocking(boolean blocking) {
+		this.blocking = blocking;
+	}
+
+	public EntityEvent getEvent() {
 		return event;
 	}
 
-	public void setEvent(EntityStoryEvent event) {
+	public void setEvent(EntityEvent event) {
 		this.event = event;
 		event.setEntity(this);
+	}
+
+	public EntityEvent getTouchEvent() {
+		return touchEvent;
+	}
+
+	public void setTouchEvent(EntityEvent touchEvent) {
+		this.touchEvent = touchEvent;
+		touchEvent.setEntity(this);
 	}
 
 	public int getMovementDuration() {
@@ -225,7 +265,9 @@ public class Entity implements ActionUser {
 		new Thread(event).start();
 	}
 
-	public void touch(Entity toucher) {}
+	public void touch(Entity toucher) {
+		new Thread(touchEvent).start();
+	}
 
 	@Override
 	public String toString() {
@@ -233,7 +275,6 @@ public class Entity implements ActionUser {
 		if (!action.isFinished()) {
 			result += "_" + action;
 		}
-		result += "_" + direction;
 		return result;
 	}
 

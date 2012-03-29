@@ -4,8 +4,6 @@ import java.awt.Point;
 
 import javax.vecmath.Vector2f;
 
-import owengine.core.util.direction.Direction;
-
 public class MovementAction extends EntityAction {
 
 	private Direction direction;
