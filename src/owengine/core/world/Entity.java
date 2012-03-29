@@ -275,6 +275,7 @@ public class Entity implements ActionUser {
 		if (!action.isFinished()) {
 			result += "_" + action;
 		}
+		result += "_" + direction;
 		return result;
 	}
 
