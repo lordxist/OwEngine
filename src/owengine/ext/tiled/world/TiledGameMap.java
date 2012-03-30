@@ -1,10 +1,12 @@
 package owengine.ext.tiled.world;
 
+import java.awt.Image;
 import java.awt.Point;
 
 import owengine.core.world.GameMap;
 import tiled.core.Map;
 import tiled.core.MapLayer;
+import tiled.core.Tile;
 import tiled.core.TileLayer;
 
 public class TiledGameMap extends GameMap {
@@ -37,7 +39,9 @@ public class TiledGameMap extends GameMap {
 
 	@Override
 	public void setTileId(String layer, Point pos, int id) {
-		getTileLayer(layer).getTileAt(pos.x, pos.y).setId(id);
+		Tile tile = getTileLayer(layer).getTileAt(pos.x, pos.y);
+		Image image = tile.getTileSet().getTile(id).getImage();
+		getTileLayer(layer).getTileAt(pos.x, pos.y).setImage(image);
 	}
 
 	public TileLayer getTileLayer(String name) {
