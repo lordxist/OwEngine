@@ -13,7 +13,7 @@ public class MovingController extends EntityController {
 	}
 
 	@Override
-	public void update(int delta) {
+	public void doUpdate(int delta) {
 		if (entity.isActionFinished()) {
 			entity.applyMovement(path[step]);
 			if (!entity.isActionFinished()) {
