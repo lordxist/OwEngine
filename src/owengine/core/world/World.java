@@ -38,8 +38,9 @@ public class World {
 		player.getMap().update(delta);
 	}
 
-	public void startMapEvents() {
-		player.getMap().startMapEvents();
+	public void enterStartMap() {
+		player.getMap().enter();
+		player.getMap().startMapEvent();
 	}
 
 	public void addMapWithName(String mapName, GameMap map) {

@@ -15,7 +15,7 @@ public class GameMap {
 	private Set<Entity> entities = new HashSet<Entity>();
 	private HashMap<Point, StoryEvent> events = new HashMap<Point, StoryEvent>();
 	private StoryEvent event = StoryEvent.NULL_EVENT;
-	private Set<StoryEvent> mapEvents = new HashSet<StoryEvent>();
+	private StoryEvent mapEvent;
 	private HashMap<Point, TimedAction> posActions = new HashMap<Point, TimedAction>();
 	private HashMap<Point, Warp> warps = new HashMap<Point, Warp>();
 
@@ -34,11 +34,6 @@ public class GameMap {
 		synchronized (event) {
 			event.notify();
 		}
-		for (StoryEvent startEvent : mapEvents) {
-			synchronized (startEvent) {
-				startEvent.notify();
-			}
-		}
 	}
 
 	private void playerUpdate(Entity player) {
@@ -53,16 +48,20 @@ public class GameMap {
 		
 		StoryEvent event = events.get(player.getPosition());
 		if (event != null) {
-			this.event = event;
-			World.getInstance().getPlayer().getController().disable();
-			new Thread(event).start();
+			startEvent(event);
 		}
 	}
 
-	public void startMapEvents() {
-		for (StoryEvent mapEvent : mapEvents) {
-			new Thread(mapEvent).start();
-		}
+	private void startEvent(StoryEvent event) {
+		this.event = event;
+		World.getInstance().getPlayer().getController().disable();
+		new Thread(event).start();
+	}
+
+	public void enter() {}
+
+	public void startMapEvent() {
+		startEvent(mapEvent);
 	}
 
 	public void paint(Graphics g) {
@@ -92,9 +91,9 @@ public class GameMap {
 		events.put(pos, event);
 	}
 
-	public void addMapEvent(StoryEvent event) {
-		mapEvents.add(event);
-		event.setMap(this);
+	public void setMapEvent(StoryEvent mapEvent) {
+		this.mapEvent = mapEvent;
+		mapEvent.setMap(this);
 	}
 
 	public boolean isBlocked(Point position) {
