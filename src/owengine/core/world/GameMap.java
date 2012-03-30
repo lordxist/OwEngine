@@ -23,6 +23,13 @@ public class GameMap {
 		for (Entity e : entities) {
 			e.update(delta);
 		}
+		Entity player = World.getInstance().getPlayer();
+		if (player != null) {
+			playerUpdate(player);
+		}
+		for (Entity e : entities) {
+			e.updateController(delta);
+		}
 		
 		synchronized (event) {
 			event.notify();
@@ -32,12 +39,6 @@ public class GameMap {
 				startEvent.notify();
 			}
 		}
-		
-		Entity player = World.getInstance().getPlayer();
-		if (player != null) {
-			playerUpdate(player);
-		}
-		
 	}
 
 	private void playerUpdate(Entity player) {
@@ -53,6 +54,7 @@ public class GameMap {
 		StoryEvent event = events.get(player.getPosition());
 		if (event != null) {
 			this.event = event;
+			World.getInstance().getPlayer().getController().disable();
 			new Thread(event).start();
 		}
 	}

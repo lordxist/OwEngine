@@ -39,7 +39,6 @@ public abstract class StoryEvent implements Runnable {
 
 	@Override
 	public synchronized void run() {
-		World.getInstance().getPlayer().getController().disable();
 		finished = false;
 		runEvent();
 		finished = true;

@@ -83,7 +83,10 @@ public class Entity implements ActionUser {
 
 	public void update(int delta) {
 		action.update(delta);
-		controller.update(delta);
+	}
+
+	public void updateController(int delta) {
+		controller.update(delta);		
 	}
 
 	public void paint(Graphics g) {
