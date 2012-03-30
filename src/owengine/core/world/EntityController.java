@@ -3,7 +3,7 @@ package owengine.core.world;
 public abstract class EntityController {
 
 	public static final EntityController NULL_CONTROLLER = new EntityController() {
-		@Override public void update(int delta) {}
+		@Override protected void doUpdate(int delta) {}
 	};
 
 	protected boolean disabled;
@@ -29,6 +29,14 @@ public abstract class EntityController {
 		return disabled;
 	}
 
-	public abstract void update(int delta);
+	public void update(int delta) {
+		if (disabled) {
+			return;
+		}
+		
+		doUpdate(delta);
+	}
+
+	protected abstract void doUpdate(int delta);
 
 }
