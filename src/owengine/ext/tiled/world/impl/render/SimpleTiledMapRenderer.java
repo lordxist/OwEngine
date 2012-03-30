@@ -18,8 +18,8 @@ public class SimpleTiledMapRenderer extends MapRenderer {
 			
 		tiled.view.MapRenderer tiledRenderer = new tiled.view.OrthogonalRenderer(tiledMap);
 		Graphics2D g2 = (Graphics2D) g.create(
-			renderer.getX(),
-			renderer.getY(),
+			renderer.getX()+(renderer.getWidth()/2),
+			renderer.getY()+(renderer.getHeight()/2),
 			renderer.getWidth(),
 			renderer.getHeight()
 		);
