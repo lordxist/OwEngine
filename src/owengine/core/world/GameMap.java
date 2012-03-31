@@ -74,8 +74,15 @@ public class GameMap {
 	}
 
 	public void addEntity(Entity e) {
+		if (e.getMap() != null) {
+			e.getMap().removeEntity(e);
+		}
 		e.setMap(this);
 		entities.add(e);
+	}
+
+	public void removeEntity(Entity e) {
+		entities.remove(e);
 	}
 
 	public Entity getEntity(Point pos) {
