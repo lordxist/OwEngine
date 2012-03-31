@@ -15,7 +15,7 @@ public class GameMap {
 	private Set<Entity> entities = new HashSet<Entity>();
 	private HashMap<Point, StoryEvent> events = new HashMap<Point, StoryEvent>();
 	private StoryEvent event = StoryEvent.NULL_EVENT;
-	private StoryEvent mapEvent;
+	private StoryEvent mapEvent = StoryEvent.NULL_EVENT;
 	private HashMap<Point, TimedAction> posActions = new HashMap<Point, TimedAction>();
 	private HashMap<Point, Warp> warps = new HashMap<Point, Warp>();
 
