@@ -14,7 +14,7 @@ public class Warp {
 
 	public void warp(Entity e) {
 		targetMap.addEntity(e);
-		e.setPosition(targetPos);
+		e.position = targetPos;
 		targetMap.enter();
 		targetMap.startMapEvent();
 	}

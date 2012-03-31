@@ -20,35 +20,16 @@ public class GameMap {
 	private HashMap<Point, Warp> warps = new HashMap<Point, Warp>();
 
 	public void update(int delta) {
-		for (Entity e : entities) {
+		for (Entity e : new HashSet<Entity>(this.entities)) {
 			e.update(delta);
 		}
-		Entity player = World.getInstance().getPlayer();
-		if (player != null) {
-			playerUpdate(player);
-		}
+		
 		for (Entity e : entities) {
 			e.updateController(delta);
 		}
 		
 		synchronized (event) {
 			event.notify();
-		}
-	}
-
-	private void playerUpdate(Entity player) {
-		if (!event.isFinished()) {
-			return;
-		}
-		
-		Warp warp = warps.get(player.getPosition());
-		if (warp != null) {
-			warp.warp(player);
-		}
-		
-		StoryEvent event = events.get(player.getPosition());
-		if (event != null) {
-			startEvent(event);
 		}
 	}
 
@@ -128,6 +109,22 @@ public class GameMap {
 
 	public void touchPos(Point pos) {
 		posActions.get(pos).start();
+	}
+
+	public void changePosition(Entity entity) {
+		if (!(entity.equals(World.getInstance().getPlayer())) || !event.isFinished()) {
+			return;
+		}
+		
+		Warp warp = warps.get(entity.getPosition());
+		if (warp != null) {
+			warp.warp(entity);
+		}
+		
+		StoryEvent event = events.get(entity.getPosition());
+		if (event != null) {
+			startEvent(event);
+		}
 	}
 
 	public void addWarp(Point pos, Warp warp) {

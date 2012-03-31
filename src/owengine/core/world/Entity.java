@@ -128,7 +128,11 @@ public class Entity implements ActionUser {
 	}
 
 	public void setPosition(Point position) {
+		Point oldPosition = this.position;
 		this.position = position;
+		if (!this.position.equals(oldPosition)) {
+			map.changePosition(this);
+		}
 	}
 
 	public Point posNextTo(Direction direction) {
