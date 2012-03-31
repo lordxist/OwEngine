@@ -85,6 +85,9 @@ public class GameMap {
 	}
 
 	public boolean isBlocked(Point position) {
+		if (position.x < 0 || position.y < 0) {
+			return true;
+		}
 		for (Entity e : entities) {
 			if (e.blocks(position)) {
 				return true;
