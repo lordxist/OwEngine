@@ -123,6 +123,10 @@ public class GameMap {
 		posActions.get(pos).start();
 	}
 
+	public void addWarp(Point pos, Warp warp) {
+		warps.put(pos, warp);
+	}
+
 	/**
 	 * Convenience method to retrieve a specific tile's id.
 	 * Implemented only in subclasses in extensions.

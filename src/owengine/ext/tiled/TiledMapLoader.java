@@ -1,11 +1,14 @@
 package owengine.ext.tiled;
 
+import java.awt.Point;
 import java.io.File;
 import java.util.Iterator;
 
 import owengine.core.MapLoader;
 import owengine.core.world.Entity;
 import owengine.core.world.GameMap;
+import owengine.core.world.Warp;
+import owengine.core.world.World;
 import owengine.ext.tiled.world.TiledGameMap;
 import tiled.core.Map;
 import tiled.core.MapLayer;
@@ -30,7 +33,23 @@ public class TiledMapLoader implements MapLoader {
 							return objectGroup.getObjects();
 						}
 					}) {
-						map.addEntity(loadEntity(object));
+						Point pos = new Point(
+							object.getX()/tiledMap.getTileWidth(),
+							object.getY()/tiledMap.getTileHeight()
+						);
+						if (object.getType().equals("Entity")) {
+							map.addEntity(loadEntity(object));
+						} else if (object.getType().equals("Warp")) {
+							GameMap targetMap = World.getInstance().getMapByName(
+									object.getProperties().getProperty("targetMap"));
+							Point targetPos = new Point(
+								Integer.parseInt(
+										object.getProperties().getProperty("targetX")),
+								Integer.parseInt(
+										object.getProperties().getProperty("targetY"))
+							);
+							map.addWarp(pos, new Warp(targetMap, targetPos));
+						}
 					}
 				}
 			}
