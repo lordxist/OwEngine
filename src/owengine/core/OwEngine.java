@@ -115,9 +115,12 @@ public class OwEngine {
 		String[] mapNames = mapLoader.getMapNames();
 		for (String mapName : mapNames) {
 			GameMap map = mapFactory.createNew();
+			world.addMapWithName(mapName, map);
+		}
+		for (String mapName : mapNames) {
+			GameMap map = world.getMapByName(mapName);
 			mapLoader.load(mapName, map);
 			map.setRenderComponent(newMapRenderComponent());
-			world.addMapWithName(mapName, map);
 		}
 		
 		Entity player = world.getPlayer();
