@@ -20,12 +20,12 @@ public class GameMap {
 	private HashMap<Point, Warp> warps = new HashMap<Point, Warp>();
 
 	public void update(int delta) {
-		for (Entity e : new HashSet<Entity>(this.entities)) {
-			e.update(delta);
-		}
-		
 		for (Entity e : entities) {
 			e.updateController(delta);
+		}
+		
+		for (Entity e : new HashSet<Entity>(this.entities)) {
+			e.update(delta);
 		}
 		
 		synchronized (event) {
@@ -110,21 +110,41 @@ public class GameMap {
 		});
 	}
 
-	public void touchPos(Point pos) {
-		posActions.get(pos).start();
+	public void touchPos(Entity entity) {
+		if (posActions.get(entity.getPosition()) != null) {
+			posActions.get(entity.getPosition()).start();
+		}
+		if (entity.equals(World.getInstance().getPlayer())) {
+			playerTouchPos(entity);
+		}
+	}
+
+	private void playerTouchPos(Entity player) {
+		if (!event.isFinished()) {
+			return;
+		}
+		Warp warp = warps.get(player.posNextTo(player.getDirection()));
+		if (warp != null && warp.isDoorWarp()) {
+			player.action = TimedAction.NULL_ACTION;
+			warp.warp(player);
+		}
 	}
 
 	public void changePosition(Entity entity) {
-		if (!(entity.equals(World.getInstance().getPlayer())) || !event.isFinished()) {
+		if (entity.equals(World.getInstance().getPlayer())) {
+			playerChangePosition(entity);
+		}
+	}
+
+	private void playerChangePosition(Entity player) {
+		if (!event.isFinished()) {
 			return;
 		}
-		
-		Warp warp = warps.get(entity.getPosition());
+		Warp warp = warps.get(player.getPosition());
 		if (warp != null) {
-			warp.warp(entity);
+			warp.warp(player);
 		}
-		
-		StoryEvent event = events.get(entity.getPosition());
+		StoryEvent event = events.get(player.getPosition());
 		if (event != null) {
 			startEvent(event);
 		}

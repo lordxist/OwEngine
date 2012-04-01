@@ -204,6 +204,7 @@ public class Entity implements ActionUser {
 		if (touched != null) {
 			touched.touch(this);
 		}
+		map.touchPos(this);
 		applyAction(new MovementAction(movementDuration, direction));
 	}
 

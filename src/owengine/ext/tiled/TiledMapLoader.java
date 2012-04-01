@@ -48,7 +48,10 @@ public class TiledMapLoader implements MapLoader {
 								Integer.parseInt(
 										object.getProperties().getProperty("targetY"))
 							);
-							map.addWarp(pos, new Warp(targetMap, targetPos));
+							boolean doorWarp = Boolean.parseBoolean(
+									object.getProperties().getProperty(
+											"doorWarp", "false"));
+							map.addWarp(pos, new Warp(targetMap, targetPos, doorWarp));
 						}
 					}
 				}
