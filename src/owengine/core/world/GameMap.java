@@ -16,8 +16,32 @@ public class GameMap {
 	private HashMap<Point, StoryEvent> events = new HashMap<Point, StoryEvent>();
 	private StoryEvent event = StoryEvent.NULL_EVENT;
 	private StoryEvent mapEvent = StoryEvent.NULL_EVENT;
-	private HashMap<Point, TimedAction> posActions = new HashMap<Point, TimedAction>();
 	private HashMap<Point, Warp> warps = new HashMap<Point, Warp>();
+	private HashMap<String, Layer> layers = new HashMap<String, Layer>();
+
+	private class Layer {
+	
+		private HashMap<Point, TimedAction> posActions = new HashMap<Point, TimedAction>();
+	
+		private Layer() {}
+
+		public void addPosAction(Point pos, TimedAction action) {
+			posActions.put(pos, action);
+		}
+
+		public void addPosAction(Point pos, String name, int duration) {
+			addPosAction(pos, new TimedAction(name, duration) {
+				@Override public void updateAction(float delta) {}
+			});
+		}
+	
+		public void touchPos(Entity entity) {
+			if (posActions.get(entity.getPosition()) != null) {
+				posActions.get(entity.getPosition()).start();
+			}
+		}
+	
+	}
 
 	public void update(int delta) {
 		for (Entity e : entities) {
@@ -100,19 +124,9 @@ public class GameMap {
 		return Collections.unmodifiableSet(entities);
 	}
 
-	public void addPosAction(Point pos, TimedAction action) {
-		posActions.put(pos, action);
-	}
-
-	public void addPosAction(Point pos, String name, int duration) {
-		addPosAction(pos, new TimedAction(name, duration) {
-			@Override public void updateAction(float delta) {}
-		});
-	}
-
 	public void touchPos(Entity entity) {
-		if (posActions.get(entity.getPosition()) != null) {
-			posActions.get(entity.getPosition()).start();
+		for (Layer layer : layers.values()) {
+			layer.touchPos(entity);
 		}
 		if (entity.equals(World.getInstance().getPlayer())) {
 			playerTouchPos(entity);
@@ -152,6 +166,14 @@ public class GameMap {
 
 	public void addWarp(Point pos, Warp warp) {
 		warps.put(pos, warp);
+	}
+
+	public void addLayer(String layerName) {
+		layers.put(layerName, new Layer());
+	}
+
+	public Layer getLayer(String layerName) {
+		return layers.get(layerName);
 	}
 
 	/**
