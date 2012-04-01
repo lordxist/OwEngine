@@ -17,12 +17,9 @@ public class SimpleTiledMapRenderer extends MapRenderer {
 		Map tiledMap = tiledGameMap.getTiledMap();
 			
 		tiled.view.MapRenderer tiledRenderer = new tiled.view.OrthogonalRenderer(tiledMap);
-		Graphics2D g2 = (Graphics2D) g.create(
-			renderer.getX()+(renderer.getWidth()/2),
-			renderer.getY()+(renderer.getHeight()/2),
-			renderer.getWidth(),
-			renderer.getHeight()
-		);
+		Graphics2D g2 = (Graphics2D) g.create();
+		g2.setClip(0, 0, renderer.getWidth(), renderer.getHeight());
+		g2.translate(-renderer.getX(), -renderer.getY());
 		for (MapLayer layer : tiledMap.getLayers()) {
 			if (layer instanceof TileLayer &&
 					!(layer.getProperties().containsKey("render") &&

@@ -21,12 +21,12 @@ public abstract class MapRenderer {
 
 		@Override
 		public int getX() {
-			return (int)(-centerEntity.getExactPos().x*fieldSize);
+			return (int)(centerEntity.getExactPos().x*fieldSize) - (width/2);
 		}
 
 		@Override
 		public int getY() {
-			return (int)(-centerEntity.getExactPos().y*fieldSize);
+			return (int)(centerEntity.getExactPos().y*fieldSize) - (height/2);
 		}
 
 	}
