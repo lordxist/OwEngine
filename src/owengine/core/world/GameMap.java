@@ -21,21 +21,43 @@ public class GameMap {
 
 	private class Layer {
 	
+		private String name;
 		private HashMap<Point, TimedAction> posActions = new HashMap<Point, TimedAction>();
 	
-		private Layer() {}
-
-		public void addPosAction(Point pos, TimedAction action) {
-			posActions.put(pos, action);
+		private Layer(String name) {
+			this.name = name;
 		}
 
-		public void addPosAction(Point pos, String name, int duration) {
+		private void addPosAction(final Point pos, final TimedAction action) {
+			TimedAction tileAction;
+			int tileId;
+			if ((tileId = getTileId(name, pos)) != -1) {
+				tileAction = new TimedAction(action.getName() + "_" + tileId,
+						action.getDuration()) {
+					@Override
+					public void start() {
+						name = action.getName() + "_" + getTileId(Layer.this.name, pos);
+						super.start();
+					}
+					
+					@Override
+					public void updateAction(float delta) {
+						action.updateAction(delta);
+					}
+				};
+			} else {
+				tileAction = action;
+			}
+			posActions.put(pos, tileAction);
+		}
+
+		private void addPosAction(Point pos, String name, int duration) {
 			addPosAction(pos, new TimedAction(name, duration) {
 				@Override public void updateAction(float delta) {}
 			});
 		}
 	
-		public void touchPos(Entity entity) {
+		private void touchPos(Entity entity) {
 			if (posActions.get(entity.getPosition()) != null) {
 				posActions.get(entity.getPosition()).start();
 			}
@@ -168,12 +190,12 @@ public class GameMap {
 		warps.put(pos, warp);
 	}
 
-	public void addLayer(String layerName) {
-		layers.put(layerName, new Layer());
+	public void addPosAction(String layerName, Point pos, String name, int duration) {
+		layers.get(layerName).addPosAction(pos, name, duration);
 	}
 
-	public Layer getLayer(String layerName) {
-		return layers.get(layerName);
+	public void addPosAction(String layerName, Point pos, TimedAction action) {
+		layers.get(layerName).addPosAction(pos, action);
 	}
 
 	/**
