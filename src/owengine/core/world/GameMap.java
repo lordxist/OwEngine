@@ -102,7 +102,7 @@ public class GameMap {
 
 	public void touchPos(Entity entity) {
 		for (TileLayer layer : layers) {
-			layer.touchPos(entity.getPosition());
+			layer.touchPos(entity);
 		}
 		if (entity.equals(World.getInstance().getPlayer())) {
 			playerTouchPos(entity);

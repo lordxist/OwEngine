@@ -35,8 +35,8 @@ public class TileLayer {
 		return Collections.unmodifiableSet(tiles);
 	}
 
-	public void touchPos(Point pos) {
-		tileAtPos(pos).touch();
+	public void touchPos(Entity e) {
+		tileAtPos(e.getPosition()).touch(e);
 	}
 
 }

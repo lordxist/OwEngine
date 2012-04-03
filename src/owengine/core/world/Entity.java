@@ -51,6 +51,7 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 	protected int movementDuration = STD_MOVEMENT_DURATION;
 	protected EntityEvent event = EntityEvent.NULL_ENTITY_EVENT;
 	protected EntityEvent touchEvent = EntityEvent.NULL_ENTITY_EVENT;
+	protected String state;
 	protected String message;
 	protected HashMap<String, String> properties = new HashMap<String, String>();
 
@@ -244,6 +245,14 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 	public void setTouchEvent(EntityEvent touchEvent) {
 		this.touchEvent = touchEvent;
 		touchEvent.setEntity(this);
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
 	}
 
 	public int getMovementDuration() {

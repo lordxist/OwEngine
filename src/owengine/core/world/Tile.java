@@ -13,6 +13,7 @@ public class Tile implements PositionedRenderer.Positioned {
 	private Point pos;
 	private String name;
 	private TimedAction touchAction;
+	private String entityState;
 
 	public Tile(Point pos, String name) {
 		this.pos = pos;
@@ -49,8 +50,7 @@ public class Tile implements PositionedRenderer.Positioned {
 	}
 
 	public void setTouchAction(final TimedAction action) {
-		touchAction = new TimedAction(action.getName() + "_" + name,
-				action.getDuration()) {
+		touchAction = new TimedAction(null, action.getDuration()) {
 			@Override
 			public void start() {
 				name = action.getName() + "_" + Tile.this.name;
@@ -70,8 +70,9 @@ public class Tile implements PositionedRenderer.Positioned {
 		});
 	}
 
-	public void touch() {
+	public void touch(Entity e) {
 		touchAction.start();
+		e.setState(entityState);
 	}
 
 }
