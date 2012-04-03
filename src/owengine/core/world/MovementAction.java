@@ -15,7 +15,6 @@ public class MovementAction extends EntityAction {
 
 	@Override
 	public void updateAction(float delta) {
-		entity.setDirection(direction);
 		entity.setDeltaPos(newDeltaPos(delta));
 	}
 

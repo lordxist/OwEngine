@@ -200,6 +200,7 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 		if (map.isBlocked(posNextTo(direction))) {
 			return;
 		}
+		this.direction = direction;
 		Entity touched = map.getEntity(posNextTo(direction));
 		if (touched != null) {
 			touched.touch(this);
