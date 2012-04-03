@@ -7,7 +7,7 @@ import owengine.core.world.MapRenderer;
 public class CenteredTiledMapRenderer extends MapRenderer.CenteredRenderer {
 
 	@Override
-	public void paint(Graphics g) {
+	protected void paintTiles(Graphics g) {
 		SimpleTiledMapRenderer.render(this, g);
 	}
 

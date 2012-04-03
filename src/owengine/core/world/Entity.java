@@ -9,7 +9,7 @@ import javax.vecmath.Vector2f;
 import owengine.core.util.timed.ActionUser;
 import owengine.core.util.timed.TimedAction;
 
-public class Entity implements ActionUser {
+public class Entity implements ActionUser, PositionedRenderer.Positioned {
 
 	public static abstract class EntityEvent extends StoryEvent {
 
@@ -38,7 +38,7 @@ public class Entity implements ActionUser {
 
 	public static final int STD_MOVEMENT_DURATION = 300;
 
-	protected Renderer renderComponent;
+	protected PositionedRenderer<Entity> renderComponent;
 	protected EntityController controller = EntityController.NULL_CONTROLLER;
 	protected int id;
 	protected String type;
@@ -93,13 +93,13 @@ public class Entity implements ActionUser {
 		renderComponent.paint(g);
 	}
 
-	public Renderer getRenderComponent() {
+	public PositionedRenderer<Entity> getRenderComponent() {
 		return renderComponent;
 	}
 
-	public void setRenderComponent(Renderer renderComponent) {
+	public void setRenderComponent(PositionedRenderer<Entity> renderComponent) {
 		this.renderComponent = renderComponent;
-		renderComponent.setEntity(this);
+		renderComponent.setRendered(this);
 	}
 
 	public EntityController getController() {

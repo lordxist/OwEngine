@@ -45,10 +45,19 @@ public abstract class MapRenderer {
 	}
 
 	public void paint(Graphics g) {
+		paintTiles(g);
 		paintEntities(g);
 	}
 
-	public void paintEntities(Graphics g) {
+	protected void paintTiles(Graphics g) {
+		for (TileLayer layer : map.getLayers()) {
+			for (Tile tile : layer.getTiles()) {
+				tile.paint(g);
+			}
+		}
+	}
+
+	protected void paintEntities(Graphics g) {
 		for (Entity e : map.getEntities()) {
 			e.paint(g);
 		}

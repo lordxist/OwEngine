@@ -17,53 +17,7 @@ public class GameMap {
 	private StoryEvent event = StoryEvent.NULL_EVENT;
 	private StoryEvent mapEvent = StoryEvent.NULL_EVENT;
 	private HashMap<Point, Warp> warps = new HashMap<Point, Warp>();
-	private HashMap<String, Layer> layers = new HashMap<String, Layer>();
-
-	private class Layer {
-	
-		private String name;
-		private HashMap<Point, TimedAction> posActions = new HashMap<Point, TimedAction>();
-	
-		private Layer(String name) {
-			this.name = name;
-		}
-
-		private void addPosAction(final Point pos, final TimedAction action) {
-			TimedAction tileAction;
-			int tileId;
-			if ((tileId = getTileId(name, pos)) != -1) {
-				tileAction = new TimedAction(action.getName() + "_" + tileId,
-						action.getDuration()) {
-					@Override
-					public void start() {
-						name = action.getName() + "_" + getTileId(Layer.this.name, pos);
-						super.start();
-					}
-					
-					@Override
-					public void updateAction(float delta) {
-						action.updateAction(delta);
-					}
-				};
-			} else {
-				tileAction = action;
-			}
-			posActions.put(pos, tileAction);
-		}
-
-		private void addPosAction(Point pos, String name, int duration) {
-			addPosAction(pos, new TimedAction(name, duration) {
-				@Override public void updateAction(float delta) {}
-			});
-		}
-	
-		private void touchPos(Entity entity) {
-			if (posActions.get(entity.getPosition()) != null) {
-				posActions.get(entity.getPosition()).start();
-			}
-		}
-	
-	}
+	private Set<TileLayer> layers = new HashSet<TileLayer>();
 
 	public void update(int delta) {
 		for (Entity e : entities) {
@@ -147,8 +101,8 @@ public class GameMap {
 	}
 
 	public void touchPos(Entity entity) {
-		for (Layer layer : layers.values()) {
-			layer.touchPos(entity);
+		for (TileLayer layer : layers) {
+			layer.touchPos(entity.getPosition());
 		}
 		if (entity.equals(World.getInstance().getPlayer())) {
 			playerTouchPos(entity);
@@ -190,26 +144,17 @@ public class GameMap {
 		warps.put(pos, warp);
 	}
 
-	public void addPosAction(String layerName, Point pos, String name, int duration) {
-		layers.get(layerName).addPosAction(pos, name, duration);
+	public TileLayer getLayerByName(String name) {
+		for (TileLayer layer : layers) {
+			if (layer.getName().equals(name)) {
+				return layer;
+			}
+		}
+		return null;
 	}
 
-	public void addPosAction(String layerName, Point pos, TimedAction action) {
-		layers.get(layerName).addPosAction(pos, action);
+	public Set<TileLayer> getLayers() {
+		return Collections.unmodifiableSet(layers);
 	}
-
-	/**
-	 * Convenience method to retrieve a specific tile's id.
-	 * Implemented only in subclasses in extensions.
-	 */
-	public int getTileId(String layer, Point pos) {
-		return -1;
-	}
-
-	/**
-	 * Convenience method to manipulate a specific tile.
-	 * Implemented only in subclasses in extensions.
-	 */
-	public void setTileId(String layer, Point pos, int id) {}
 
 }

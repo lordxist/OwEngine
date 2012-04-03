@@ -10,7 +10,7 @@ import javax.vecmath.Vector2f;
 import owengine.core.world.Entity;
 import owengine.core.world.GameMap;
 import owengine.core.world.MapRenderer;
-import owengine.core.world.Renderer;
+import owengine.core.world.PositionedRenderer;
 import owengine.core.world.World;
 
 /**
@@ -93,11 +93,11 @@ public class OwEngine {
 	private Vector2f center;
 	private String startMapName;
 	private MapLoader mapLoader;
-	private Class<? extends Renderer> renderClass;
+	private Class<? extends PositionedRenderer<Entity>> renderClass;
 	private Class<? extends MapRenderer> mapRenderClass;
 	private Class<? extends GameMap> mapClass = GameMap.class;
-	private Factory<Renderer> renderFactory =
-		new Producer<Renderer>(renderClass);
+	private Factory<PositionedRenderer<Entity>> renderFactory =
+		new Producer<PositionedRenderer<Entity>>(renderClass);
 	private Factory<MapRenderer> mapRenderFactory =
 		new Producer<MapRenderer>(mapRenderClass);
 	private Factory<GameMap> mapFactory = new Producer<GameMap>(mapClass);
@@ -136,12 +136,12 @@ public class OwEngine {
 		}
 	}
 
-	private Renderer newRenderComponent() {
-		Renderer renderer = renderFactory.createNew();
+	private PositionedRenderer<Entity> newRenderComponent() {
+		PositionedRenderer<Entity> renderer = renderFactory.createNew();
 		renderer.getHelper().setFieldSize(fieldSize);
-		if (renderer instanceof Renderer.CenteredRenderer) {
-			Renderer.CenteredRenderer centeredRenderer =
-				(Renderer.CenteredRenderer) renderer;
+		if (renderer instanceof PositionedRenderer.CenteredRenderer) {
+			PositionedRenderer.CenteredRenderer<Entity> centeredRenderer =
+				(PositionedRenderer.CenteredRenderer<Entity>) renderer;
 			centeredRenderer.setCenter(getCenter());
 			centeredRenderer.setCenterEntity(world.getPlayer());
 		}
@@ -183,7 +183,7 @@ public class OwEngine {
 		properties.load(new FileInputStream(filename));
 		String property, property2;
 		if ((property = properties.getProperty("renderClass")) != null) {
-			setRenderClass((Class<? extends Renderer>) Class.forName(property));
+			setRenderClass((Class<? extends PositionedRenderer<Entity>>) Class.forName(property));
 		}
 		if ((property = properties.getProperty("mapRenderClass")) != null) {
 			setMapRenderClass((Class<? extends MapRenderer>) Class.forName(property));
@@ -222,7 +222,7 @@ public class OwEngine {
 	/**
 	 * The class used as default for render components.
 	 */
-	public Class<? extends Renderer> getRenderClass() {
+	public Class<? extends PositionedRenderer<Entity>> getRenderClass() {
 		return renderClass;
 	}
 
@@ -230,9 +230,9 @@ public class OwEngine {
 	 * Set the default render component class.
 	 * Must have a default constructor and be accessible.
 	 */
-	public void setRenderClass(Class<? extends Renderer> renderClass) {
+	public void setRenderClass(Class<? extends PositionedRenderer<Entity>> renderClass) {
 		this.renderClass = renderClass;
-		renderFactory = new Producer<Renderer>(renderClass);
+		renderFactory = new Producer<PositionedRenderer<Entity>>(renderClass);
 	}
 
 	/**
@@ -270,14 +270,14 @@ public class OwEngine {
 	/**
 	 * The factory used to produce render components.
 	 */
-	public Factory<Renderer> getRenderFactory() {
+	public Factory<PositionedRenderer<Entity>> getRenderFactory() {
 		return renderFactory;
 	}
 
 	/**
 	 * Set the factory used to produce render components.
 	 */
-	public void setRenderFactory(Factory<Renderer> renderFactory) {
+	public void setRenderFactory(Factory<PositionedRenderer<Entity>> renderFactory) {
 		this.renderFactory = renderFactory;
 	}
 
