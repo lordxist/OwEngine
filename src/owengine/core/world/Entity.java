@@ -198,7 +198,7 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 	}
 
 	public void applyMovement(Direction direction) {
-		if (map.isBlocked(posNextTo(direction))) {
+		if (map.isBlocked(posNextTo(direction)) || !action.isFinished()) {
 			return;
 		}
 		this.direction = direction;
