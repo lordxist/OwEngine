@@ -12,8 +12,8 @@ public class Tile implements PositionedRenderer.Positioned {
 	private PositionedRenderer<Tile> renderer;
 	private Point pos;
 	private String name;
-	private TimedAction touchAction;
-	private String entityState;
+	private TimedAction touchAction = TimedAction.NULL_ACTION;
+	private EntityAction entityTouchAction = EntityAction.NULL_ACTION;
 
 	public Tile(Point pos, String name) {
 		this.pos = pos;
@@ -70,9 +70,20 @@ public class Tile implements PositionedRenderer.Positioned {
 		});
 	}
 
+	public EntityAction getEntityTouchAction()  {
+		return entityTouchAction;
+	}
+
+	public void setEntityTouchAction(EntityAction entityTouchAction) {
+		this.entityTouchAction = entityTouchAction;
+	}
+
 	public void touch(Entity e) {
 		touchAction.start();
-		e.setState(entityState);
+		if (entityTouchAction != EntityAction.NULL_ACTION) {
+			e.action = EntityAction.NULL_ACTION;
+			e.applyAction((EntityAction) entityTouchAction);
+		}
 	}
 
 }

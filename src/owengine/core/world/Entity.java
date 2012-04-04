@@ -47,7 +47,7 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 	protected Direction direction = Direction.south;
 	protected GameMap map;
 	protected boolean blocking = true;
-	protected TimedAction action = TimedAction.NULL_ACTION;
+	protected EntityAction action = EntityAction.NULL_ACTION;
 	protected int movementDuration = STD_MOVEMENT_DURATION;
 	protected EntityEvent event = EntityEvent.NULL_ENTITY_EVENT;
 	protected EntityEvent touchEvent = EntityEvent.NULL_ENTITY_EVENT;
@@ -202,12 +202,12 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 			return;
 		}
 		this.direction = direction;
+		applyAction(new MovementAction(movementDuration, direction));
 		Entity touched = map.getEntity(posNextTo(direction));
 		if (touched != null) {
 			touched.touch(this);
 		}
 		map.touchPos(this);
-		applyAction(new MovementAction(movementDuration, direction));
 	}
 
 	public boolean blocks(Point position) {

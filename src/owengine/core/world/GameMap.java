@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import owengine.core.util.timed.TimedAction;
-
 public class GameMap {
 
 	private MapRenderer renderComponent;
@@ -115,7 +113,7 @@ public class GameMap {
 		}
 		Warp warp = warps.get(player.posNextTo(player.getDirection()));
 		if (warp != null && warp.isDoorWarp()) {
-			player.action = TimedAction.NULL_ACTION;
+			player.action = EntityAction.NULL_ACTION;
 			warp.warp(player);
 		}
 	}
