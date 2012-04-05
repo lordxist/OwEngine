@@ -48,6 +48,7 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 	protected GameMap map;
 	protected boolean blocking = true;
 	protected EntityAction action = EntityAction.NULL_ACTION;
+	protected boolean moving;
 	protected int movementDuration = STD_MOVEMENT_DURATION;
 	protected EntityEvent event = EntityEvent.NULL_ENTITY_EVENT;
 	protected EntityEvent touchEvent = EntityEvent.NULL_ENTITY_EVENT;
@@ -84,6 +85,9 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 
 	public void update(int delta) {
 		action.update(delta);
+		if (action.isFinished()) {
+			moving = false;
+		}
 	}
 
 	public void updateController(int delta) {
@@ -201,6 +205,7 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 		if (map.isBlocked(posNextTo(direction)) || !action.isFinished()) {
 			return;
 		}
+		moving = true;
 		this.direction = direction;
 		applyAction(new MovementAction(movementDuration, direction));
 		Entity touched = map.getEntity(posNextTo(direction));
@@ -215,7 +220,7 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 			return false;
 		}
 		boolean result = this.position.equals(position);
-		if (!getDeltaPos().equals(new Vector2f(0, 0))) {
+		if (moving) {
 			result |= posNextTo(direction).equals(position);
 		}
 		return result;
