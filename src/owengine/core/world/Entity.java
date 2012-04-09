@@ -6,29 +6,9 @@ import java.util.HashMap;
 
 import javax.vecmath.Vector2f;
 
-import owengine.core.util.timed.ActionUser;
 import owengine.core.util.timed.TimedAction;
 
-public class Entity implements ActionUser, PositionedRenderer.Positioned {
-
-	public static abstract class EntityEvent extends StoryEvent {
-
-		public static final EntityEvent NULL_ENTITY_EVENT = new EntityEvent(null) {
-			@Override
-			public void runEvent() {}
-		};
-		
-		protected Entity entity;
-
-		public EntityEvent(String name) {
-			super(name);
-		}
-	
-		private void setEntity(Entity entity) {
-			this.entity = entity;
-		}
-	
-	}
+public class Entity implements PositionedRenderer.Positioned {
 
 	private static HashMap<Integer, Entity> entities = new HashMap<Integer, Entity>();
 
@@ -36,7 +16,33 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 		return entities.get(id);
 	}
 
-	public static final int STD_MOVEMENT_DURATION = 300;
+	public static final int STD_MOVEMENT_DURATION = 400;
+
+	private class MovementAction extends TimedAction {
+
+		public MovementAction() {
+			super("move", movementDuration);
+		}
+
+		@Override
+		public void updateAction(float delta) {
+			setDeltaPos(newDeltaPos(delta));
+		}
+
+		private Vector2f newDeltaPos(float delta) {
+			Point vector = direction.getVector();
+			Vector2f result = new Vector2f(vector.x, vector.y);
+			result.scale(delta);
+			return result;
+		}
+
+		@Override
+		protected void finish() {
+			setPosition(posNextTo(direction));
+			setDeltaPos(new Vector2f(0, 0));
+		}
+
+	}
 
 	protected PositionedRenderer<Entity> renderComponent;
 	protected EntityController controller = EntityController.NULL_CONTROLLER;
@@ -47,7 +53,7 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 	protected Direction direction = Direction.south;
 	protected GameMap map;
 	protected boolean blocking = true;
-	protected EntityAction action = EntityAction.NULL_ACTION;
+	protected TimedAction action = TimedAction.NULL_ACTION;
 	protected boolean moving;
 	protected int movementDuration = STD_MOVEMENT_DURATION;
 	protected EntityEvent event = EntityEvent.NULL_ENTITY_EVENT;
@@ -178,25 +184,41 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 		this.map = map;
 	}
 
-	public void applyAction(EntityAction action) {
+	public void applyAction(String name, int duration) {
+		applyAction(new TimedAction(name, duration));
+	}
+
+	private void applyAction(TimedAction action) {
 		if (isActionFinished()) {
-			action.setEntity(this);
 			action.start();
 			this.action = action;
 		}
 	}
 
-	public void applyAction(String name, int duration) {
-		applyAction(new EntityAction(name, duration) {
-			@Override public void updateAction(float delta) {}
-		});
+	void deleteAction() {
+		action = TimedAction.NULL_ACTION;
 	}
 
-	public TimedAction getAction() {
-		return action;
+	void setActionName(String name) {
+		action.setName(name);
 	}
 
-	@Override
+	void setActionDuration(int duration) {
+		action.setDuration(duration);
+	}
+
+	public String getAction() {
+		return action.getName();
+	}
+
+	public int getActionDuration() {
+		return action.getDuration();
+	}
+
+	public int getActionTime() {
+		return action.getTime();
+	}
+
 	public boolean isActionFinished() {
 		return action.isFinished();
 	}
@@ -207,7 +229,7 @@ public class Entity implements ActionUser, PositionedRenderer.Positioned {
 		}
 		moving = true;
 		this.direction = direction;
-		applyAction(new MovementAction(movementDuration, direction));
+		applyAction(new MovementAction());
 		Entity touched = map.getEntity(posNextTo(direction));
 		if (touched != null) {
 			touched.touch(this);

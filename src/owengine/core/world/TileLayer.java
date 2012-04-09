@@ -36,7 +36,10 @@ public class TileLayer {
 	}
 
 	public void touchPos(Entity e) {
-		tileAtPos(e.getPosition()).touch(e);
+		Tile tile;
+		if ((tile = tileAtPos(e.posNextTo(e.getDirection()))) != null) {
+			tile.touch(e);
+		}
 	}
 
 }

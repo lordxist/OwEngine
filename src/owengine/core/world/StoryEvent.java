@@ -2,8 +2,6 @@ package owengine.core.world;
 
 import java.util.HashMap;
 
-import owengine.core.util.timed.ActionUser;
-
 public abstract class StoryEvent implements Runnable {
 
 	public static final StoryEvent NULL_EVENT = new StoryEvent() {
@@ -62,8 +60,8 @@ public abstract class StoryEvent implements Runnable {
 		return map;
 	}
 
-	protected void pauseForAction(ActionUser actionUser) {
-		while (!actionUser.isActionFinished()) {
+	protected void pauseForAction(Entity entity) {
+		while (!entity.isActionFinished()) {
 			try {
 				wait();
 			} catch (InterruptedException e) {

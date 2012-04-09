@@ -1,8 +1,13 @@
 package owengine.core.util.timed;
 
-public abstract class TimedAction {
+public class TimedAction {
 
-	public static final TimedAction NULL_ACTION = new NullAction();
+	public static final TimedAction NULL_ACTION = new TimedAction(null, 0) {
+		@Override
+		public boolean isFinished() {
+			return true;
+		}
+	};
 
 	protected String name;
 	protected int time;
@@ -34,10 +39,14 @@ public abstract class TimedAction {
 		}
 	}
 
-	public abstract void updateAction(float delta);
+	public void updateAction(float delta) {}
 
 	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public int getTime() {
@@ -46,6 +55,10 @@ public abstract class TimedAction {
 
 	public int getDuration() {
 		return duration;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
 	}
 
 	public float getDelta() {

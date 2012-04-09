@@ -12,8 +12,10 @@ public class Tile implements PositionedRenderer.Positioned {
 	private PositionedRenderer<Tile> renderer;
 	private Point pos;
 	private String name;
-	private TimedAction touchAction = TimedAction.NULL_ACTION;
-	private EntityAction entityTouchAction = EntityAction.NULL_ACTION;
+	private String touchAction;
+	private int touchActionDuration;
+	private String entityTouchAction;
+	private int entityTouchActionDuration;
 
 	public Tile(Point pos, String name) {
 		this.pos = pos;
@@ -45,44 +47,37 @@ public class Tile implements PositionedRenderer.Positioned {
 		this.name = name;
 	}
 
-	public TimedAction getTouchAction() {
+	public String getTouchAction() {
 		return touchAction;
 	}
 
-	public void setTouchAction(final TimedAction action) {
-		touchAction = new TimedAction(null, action.getDuration()) {
-			@Override
-			public void start() {
-				name = action.getName() + "_" + Tile.this.name;
-				super.start();
-			}
-			
-			@Override
-			public void updateAction(float delta) {
-				action.updateAction(delta);
-			}
-		};
+	public int getTouchActionDuration() {
+		return touchActionDuration;
 	}
 
 	public void setTouchAction(String name, int duration) {
-		setTouchAction(new TimedAction(name, duration) {
-			@Override public void updateAction(float delta) {}
-		});
+		touchAction = name;
+		touchActionDuration = duration;
 	}
 
-	public EntityAction getEntityTouchAction()  {
+	public String getEntityTouchAction() {
 		return entityTouchAction;
 	}
 
-	public void setEntityTouchAction(EntityAction entityTouchAction) {
-		this.entityTouchAction = entityTouchAction;
+	public int getEntityTouchActionDuration() {
+		return entityTouchActionDuration;
+	}
+
+	public void setEntityTouchAction(String name, int duration) {
+		entityTouchAction = name;
+		entityTouchActionDuration = duration;
 	}
 
 	public void touch(Entity e) {
-		touchAction.start();
-		if (entityTouchAction != EntityAction.NULL_ACTION) {
-			e.action = EntityAction.NULL_ACTION;
-			e.applyAction((EntityAction) entityTouchAction);
+		new TimedAction(touchAction, touchActionDuration).start();
+		if (entityTouchAction != null) {
+			e.setActionName(entityTouchAction);
+			e.setActionDuration(entityTouchActionDuration);
 		}
 	}
 

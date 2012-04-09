@@ -113,7 +113,6 @@ public class GameMap {
 		}
 		Warp warp = warps.get(player.posNextTo(player.getDirection()));
 		if (warp != null && warp.isDoorWarp()) {
-			player.action = EntityAction.NULL_ACTION;
 			warp.warp(player);
 		}
 	}
@@ -140,6 +139,10 @@ public class GameMap {
 
 	public void addWarp(Point pos, Warp warp) {
 		warps.put(pos, warp);
+	}
+
+	public void addLayer(TileLayer layer) {
+		layers.add(layer);
 	}
 
 	public TileLayer getLayerByName(String name) {

@@ -19,6 +19,7 @@ public class Warp {
 	}
 
 	public void warp(Entity e) {
+		e.deleteAction();
 		targetMap.addEntity(e);
 		e.position = targetPos;
 		targetMap.enter();
