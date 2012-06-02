@@ -29,8 +29,9 @@ public class SimpleTiledMapRenderer extends MapRenderer {
 	}
 
 	@Override
-	protected void paintTiles(Graphics g) {
+	public void paint(Graphics g) {
 		render(this, g);
+		paintEntities(g);
 	}
 
 }

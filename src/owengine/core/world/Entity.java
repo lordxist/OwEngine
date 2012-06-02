@@ -8,7 +8,7 @@ import javax.vecmath.Vector2f;
 
 import owengine.core.util.timed.TimedAction;
 
-public class Entity implements PositionedRenderer.Positioned {
+public class Entity {
 
 	private static HashMap<Integer, Entity> entities = new HashMap<Integer, Entity>();
 
@@ -44,7 +44,7 @@ public class Entity implements PositionedRenderer.Positioned {
 
 	}
 
-	protected PositionedRenderer<Entity> renderComponent;
+	protected EntityRenderer renderComponent;
 	protected EntityController controller = EntityController.NULL_CONTROLLER;
 	protected int id;
 	protected String type;
@@ -58,6 +58,7 @@ public class Entity implements PositionedRenderer.Positioned {
 	protected int movementDuration = STD_MOVEMENT_DURATION;
 	protected EntityEvent event = EntityEvent.NULL_ENTITY_EVENT;
 	protected EntityEvent touchEvent = EntityEvent.NULL_ENTITY_EVENT;
+	protected TimedAction touchAction = TimedAction.NULL_ACTION;
 	protected String state;
 	protected String message;
 	protected HashMap<String, String> properties = new HashMap<String, String>();
@@ -104,11 +105,11 @@ public class Entity implements PositionedRenderer.Positioned {
 		renderComponent.paint(g);
 	}
 
-	public PositionedRenderer<Entity> getRenderComponent() {
+	public EntityRenderer getRenderComponent() {
 		return renderComponent;
 	}
 
-	public void setRenderComponent(PositionedRenderer<Entity> renderComponent) {
+	public void setRenderComponent(EntityRenderer renderComponent) {
 		this.renderComponent = renderComponent;
 		renderComponent.setRendered(this);
 	}
@@ -274,6 +275,18 @@ public class Entity implements PositionedRenderer.Positioned {
 		touchEvent.setEntity(this);
 	}
 
+	public String getTouchAction() {
+		return touchAction.getName();
+	}
+
+	public int getTouchActionDuration() {
+		return touchAction.getDuration();
+	}
+
+	public void setTouchAction(String name, int duration) {
+		this.touchAction = new TimedAction(name, duration);
+	}
+
 	public String getState() {
 		return state;
 	}
@@ -311,6 +324,10 @@ public class Entity implements PositionedRenderer.Positioned {
 	}
 
 	public void touch(Entity toucher) {
+		if (touchAction != TimedAction.NULL_ACTION) {
+			toucher.setActionDuration(touchAction.getDuration());
+			toucher.setActionName(touchAction.getName());
+		}
 		new Thread(touchEvent).start();
 	}
 
@@ -320,7 +337,9 @@ public class Entity implements PositionedRenderer.Positioned {
 		if (!action.isFinished()) {
 			result += "_" + action;
 		}
-		result += "_" + direction;
+		if (direction != null) {
+			result += "_" + direction;
+		}
 		return result;
 	}
 

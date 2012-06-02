@@ -4,15 +4,9 @@ import java.awt.Graphics;
 
 import javax.vecmath.Vector2f;
 
-public abstract class PositionedRenderer<T extends PositionedRenderer.Positioned> {
+public abstract class EntityRenderer {
 
-	public interface Positioned {
-
-		Vector2f getExactPos();
-
-	}
-
-	public static abstract class CenteredRenderer<T extends Positioned> extends PositionedRenderer<T> {
+	public static abstract class CenteredRenderer extends EntityRenderer {
 
 		protected Vector2f center;
 		protected Entity centerEntity;
@@ -38,10 +32,10 @@ public abstract class PositionedRenderer<T extends PositionedRenderer.Positioned
 	}
 
 	protected RenderHelper helper;
-	protected T rendered;
+	protected Entity entity;
 
-	void setRendered(T rendered) {
-		this.rendered = rendered;
+	void setRendered(Entity entity) {
+		this.entity = entity;
 	}
 
 	public abstract void paint(Graphics g);
@@ -55,11 +49,11 @@ public abstract class PositionedRenderer<T extends PositionedRenderer.Positioned
 	}
 
 	public int getX() {
-		return helper.getX(rendered.getExactPos().x);
+		return helper.getX(entity.getExactPos().x);
 	}
 
 	public int getY() {
-		return helper.getY(rendered.getExactPos().y);
+		return helper.getY(entity.getExactPos().y);
 	}
 
 	public int getWidth() {

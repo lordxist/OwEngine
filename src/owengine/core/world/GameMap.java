@@ -11,11 +11,11 @@ public class GameMap {
 
 	private MapRenderer renderComponent;
 	private Set<Entity> entities = new HashSet<Entity>();
+	private HashMap<String, Set<Entity>> entityGroups = new HashMap<String, Set<Entity>>();
 	private HashMap<Point, StoryEvent> events = new HashMap<Point, StoryEvent>();
 	private StoryEvent event = StoryEvent.NULL_EVENT;
 	private StoryEvent mapEvent = StoryEvent.NULL_EVENT;
 	private HashMap<Point, Warp> warps = new HashMap<Point, Warp>();
-	private Set<TileLayer> layers = new HashSet<TileLayer>();
 
 	public void update(int delta) {
 		for (Entity e : entities) {
@@ -65,7 +65,7 @@ public class GameMap {
 	}
 
 	public Entity getEntity(Point pos) {
-		for (Entity entity : entities) {
+		for (Entity entity : getEntities()) {
 			if (entity.getPosition().equals(pos)) {
 				return entity;
 			}
@@ -95,13 +95,23 @@ public class GameMap {
 	}
 
 	public Set<Entity> getEntities() {
-		return Collections.unmodifiableSet(entities);
+		HashSet<Entity> result = new HashSet<Entity>();
+		for (Set<Entity> entities : entityGroups.values()) {
+			result.addAll(entities);
+		}
+		result.addAll(entities);
+		return Collections.unmodifiableSet(result);
+	}
+
+	public void addEntityGroup(String name, Set<Entity> entities) {
+		entityGroups.put(name, entities);
+	}
+
+	public Set<Entity> getEntityGroup(String name) {
+		return Collections.unmodifiableSet(entityGroups.get(name));
 	}
 
 	public void touchPos(Entity entity) {
-		for (TileLayer layer : layers) {
-			layer.touchPos(entity);
-		}
 		if (entity.equals(World.getInstance().getPlayer())) {
 			playerTouchPos(entity);
 		}
@@ -139,23 +149,6 @@ public class GameMap {
 
 	public void addWarp(Point pos, Warp warp) {
 		warps.put(pos, warp);
-	}
-
-	public void addLayer(TileLayer layer) {
-		layers.add(layer);
-	}
-
-	public TileLayer getLayerByName(String name) {
-		for (TileLayer layer : layers) {
-			if (layer.getName().equals(name)) {
-				return layer;
-			}
-		}
-		return null;
-	}
-
-	public Set<TileLayer> getLayers() {
-		return Collections.unmodifiableSet(layers);
 	}
 
 }

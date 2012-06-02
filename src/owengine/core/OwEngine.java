@@ -4,13 +4,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.vecmath.Vector2f;
 
 import owengine.core.world.Entity;
 import owengine.core.world.GameMap;
 import owengine.core.world.MapRenderer;
-import owengine.core.world.PositionedRenderer;
+import owengine.core.world.EntityRenderer;
 import owengine.core.world.World;
 
 /**
@@ -93,11 +94,11 @@ public class OwEngine {
 	private Vector2f center;
 	private String startMapName;
 	private MapLoader mapLoader;
-	private Class<? extends PositionedRenderer<Entity>> renderClass;
+	private Class<? extends EntityRenderer> renderClass;
 	private Class<? extends MapRenderer> mapRenderClass;
 	private Class<? extends GameMap> mapClass = GameMap.class;
-	private Factory<PositionedRenderer<Entity>> renderFactory =
-		new Producer<PositionedRenderer<Entity>>(renderClass);
+	private Factory<EntityRenderer> renderFactory =
+		new Producer<EntityRenderer>(renderClass);
 	private Factory<MapRenderer> mapRenderFactory =
 		new Producer<MapRenderer>(mapRenderClass);
 	private Factory<GameMap> mapFactory = new Producer<GameMap>(mapClass);
@@ -136,12 +137,12 @@ public class OwEngine {
 		}
 	}
 
-	private PositionedRenderer<Entity> newRenderComponent() {
-		PositionedRenderer<Entity> renderer = renderFactory.createNew();
+	private EntityRenderer newRenderComponent() {
+		EntityRenderer renderer = renderFactory.createNew();
 		renderer.getHelper().setFieldSize(fieldSize);
-		if (renderer instanceof PositionedRenderer.CenteredRenderer) {
-			PositionedRenderer.CenteredRenderer<Entity> centeredRenderer =
-				(PositionedRenderer.CenteredRenderer<Entity>) renderer;
+		if (renderer instanceof EntityRenderer.CenteredRenderer) {
+			EntityRenderer.CenteredRenderer centeredRenderer =
+				(EntityRenderer.CenteredRenderer) renderer;
 			centeredRenderer.setCenter(getCenter());
 			centeredRenderer.setCenterEntity(world.getPlayer());
 		}
@@ -171,6 +172,13 @@ public class OwEngine {
 		entity.setRenderComponent(newRenderComponent());
 	}
 
+	public void addEntityGroup(String name, Set<Entity> entities, GameMap map) {
+		map.addEntityGroup(name, entities);
+		for (Entity entity : entities) {
+			entity.setRenderComponent(newRenderComponent());
+		}
+	}
+
 	/**
 	 * Load the properties from the given file.
 	 * @throws IOException 
@@ -183,7 +191,7 @@ public class OwEngine {
 		properties.load(new FileInputStream(filename));
 		String property, property2;
 		if ((property = properties.getProperty("renderClass")) != null) {
-			setRenderClass((Class<? extends PositionedRenderer<Entity>>) Class.forName(property));
+			setRenderClass((Class<? extends EntityRenderer>) Class.forName(property));
 		}
 		if ((property = properties.getProperty("mapRenderClass")) != null) {
 			setMapRenderClass((Class<? extends MapRenderer>) Class.forName(property));
@@ -222,7 +230,7 @@ public class OwEngine {
 	/**
 	 * The class used as default for render components.
 	 */
-	public Class<? extends PositionedRenderer<Entity>> getRenderClass() {
+	public Class<? extends EntityRenderer> getRenderClass() {
 		return renderClass;
 	}
 
@@ -230,9 +238,9 @@ public class OwEngine {
 	 * Set the default render component class.
 	 * Must have a default constructor and be accessible.
 	 */
-	public void setRenderClass(Class<? extends PositionedRenderer<Entity>> renderClass) {
+	public void setRenderClass(Class<? extends EntityRenderer> renderClass) {
 		this.renderClass = renderClass;
-		renderFactory = new Producer<PositionedRenderer<Entity>>(renderClass);
+		renderFactory = new Producer<EntityRenderer>(renderClass);
 	}
 
 	/**
@@ -270,14 +278,14 @@ public class OwEngine {
 	/**
 	 * The factory used to produce render components.
 	 */
-	public Factory<PositionedRenderer<Entity>> getRenderFactory() {
+	public Factory<EntityRenderer> getRenderFactory() {
 		return renderFactory;
 	}
 
 	/**
 	 * Set the factory used to produce render components.
 	 */
-	public void setRenderFactory(Factory<PositionedRenderer<Entity>> renderFactory) {
+	public void setRenderFactory(Factory<EntityRenderer> renderFactory) {
 		this.renderFactory = renderFactory;
 	}
 
