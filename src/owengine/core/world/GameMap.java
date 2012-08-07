@@ -2,9 +2,11 @@ package owengine.core.world;
 
 import java.awt.Graphics;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class GameMap {
@@ -94,13 +96,13 @@ public class GameMap {
 		return false;
 	}
 
-	public Set<Entity> getEntities() {
-		HashSet<Entity> result = new HashSet<Entity>();
+	public List<Entity> getEntities() {
+		ArrayList<Entity> result = new ArrayList<Entity>();
 		for (Set<Entity> entities : entityGroups.values()) {
 			result.addAll(entities);
 		}
 		result.addAll(entities);
-		return Collections.unmodifiableSet(result);
+		return Collections.unmodifiableList(result);
 	}
 
 	public void addEntityGroup(String name, Set<Entity> entities) {
